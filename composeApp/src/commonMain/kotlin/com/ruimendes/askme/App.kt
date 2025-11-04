@@ -18,11 +18,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import askme.composeapp.generated.resources.Res
 import askme.composeapp.generated.resources.compose_multiplatform
+import com.ruimendes.core.designsystem.theme.AppTheme
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    AppTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
