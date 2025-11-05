@@ -1,6 +1,6 @@
 [versions]
 agp = "8.13.0"
-composeBom = "2025.07.00"
+composeBom = "2025.11.00"
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.3"
 google-services = "4.4.3"
@@ -9,11 +9,11 @@ androidDesugarJdkLibs = "2.1.5"
 androidTools = "31.12.0"
 
 # Compose
-compose-hot-reload = "1.0.0-beta04"
-compose-multiplatform = "1.9.0-beta01"
+compose-hot-reload = "1.0.0-rc02"
+compose-multiplatform = "1.9.2"
 # Maintain compose multiplatform version aligned with navigation, cache error could happen
-compose-lifecycle = "2.9.1"
-navigation-compose = "2.9.0-beta04"
+compose-lifecycle = "2.9.5"
+navigation-compose = "2.9.1"
 jetbrains-core-bundle = "1.0.1"
 material-icons = "1.7.3"
 
@@ -25,7 +25,7 @@ androidx-test-ext = "1.2.1"
 androidx-runner = "1.6.2"
 androidx-test-core = "1.7.0"
 appcompatVersion = "1.7.1"
-core-splashscreen = "1.0.1"
+core-splashscreen = "1.2.0"
 
 # Kotlinx
 kotlinx-coroutines = "1.10.2"
@@ -33,19 +33,20 @@ kotlinx-serialization = "1.9.0"
 kotlinx-datetime = "0.7.1"
 
 # Third party
-koin = "4.1.0"
-ktor = "3.2.3"
-room = "2.7.2"
-sqlite = "2.5.2"
+koin = "4.1.1"
+ktor = "3.3.1"
+room = "2.8.3"
+sqlite = "2.6.1"
 datastore = "1.1.7"
-firebase-bom = "34.0.0"
-adaptive = "1.2.0-alpha04"
-compose-jetbrains = "1.8.2"
-jetbrains-savedstate = "1.3.1"
+firebase-bom = "34.5.0"
+adaptive = "1.2.0"
+compose-jetbrains = "1.9.0"
+jetbrains-savedstate = "1.3.5"
 coil = "3.3.0"
 coil-network = "3.3.0"
-moko = "0.19.1"
+moko = "0.20.1"
 buildkonfig = "0.17.1"
+kermit = "2.0.8"
 
 projectApplicationId = "com.ruimendes.askme"
 projectVersionName = "1.0"
@@ -129,10 +130,13 @@ firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil-network" }
 
-#Permission handling
+# Permission handling
 moko-permissions = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
 moko-permissions-notifications = { module = "dev.icerock.moko:permissions-notifications", version.ref = "moko" }
+
+# Logging
+touchlab-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 android-desugarJdkLibs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -207,5 +211,6 @@ ktor-common = [
     "ktor-client-core",
     "ktor-client-content-negotiation",
     "ktor-serialization-kotlinx-json",
-    "ktor-client-auth"
+    "ktor-client-auth",
+    "ktor-client-logging"
 ]
