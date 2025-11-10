@@ -8,15 +8,20 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,9 +43,9 @@ fun AppAdaptiveFormLayout(
     headerText: String,
     errorText: String? = null,
     logo: @Composable () -> Unit,
-    formContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
-    deviceConfiguration: DeviceConfiguration = currentDeviceConfiguration()
+    deviceConfiguration: DeviceConfiguration = currentDeviceConfiguration(),
+    formContent: @Composable ColumnScope.() -> Unit
 ) {
     val headerColor = if (deviceConfiguration == DeviceConfiguration.MOBILE_LANDSCAPE) {
         MaterialTheme.colorScheme.onBackground
@@ -78,6 +83,11 @@ fun AppAdaptiveFormLayout(
                     .fillMaxWidth()
                     .background(color = MaterialTheme.colorScheme.background)
                     .consumeWindowInsets(WindowInsets.displayCutout)
+                    .consumeWindowInsets(WindowInsets.navigationBars)
+                    .padding(
+                        WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
+                            .asPaddingValues()
+                    )
             ) {
                 Column(
                     modifier = modifier.weight(1f).padding(horizontal = 16.dp),
@@ -93,7 +103,9 @@ fun AppAdaptiveFormLayout(
                     )
                 }
                 AppSurface(modifier = modifier.weight(1f).padding(top = 16.dp, end = 16.dp)) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     formContent()
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -105,7 +117,8 @@ fun AppAdaptiveFormLayout(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(top = 24.dp),
+                    .padding(top = 24.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
