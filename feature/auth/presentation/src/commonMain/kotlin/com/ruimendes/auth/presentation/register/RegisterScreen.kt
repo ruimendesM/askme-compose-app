@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import askme.feature.auth.presentation.generated.resources.Res
 import askme.feature.auth.presentation.generated.resources.email
 import askme.feature.auth.presentation.generated.resources.email_placeholder
@@ -30,16 +29,26 @@ import com.ruimendes.core.designsystem.components.layout.AppSnackbarScaffold
 import com.ruimendes.core.designsystem.components.textfields.AppPasswordTextField
 import com.ruimendes.core.designsystem.components.textfields.AppTextField
 import com.ruimendes.core.designsystem.theme.AppTheme
+import com.ruimendes.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegisterRoot(
-    viewModel: RegisterViewModel = viewModel()
+    viewModel: RegisterViewModel = koinViewModel(),
+    onRegisterSuccess: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     val snackbarHostState = remember { SnackbarHostState() }
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is RegisterEvent.Success -> {
+                onRegisterSuccess(event.email)
+            }
+        }
+    }
 
     RegisterScreen(
         state = state,
