@@ -31,8 +31,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun AppAdaptativeResultLayout(
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
-    deviceConfiguration: DeviceConfiguration = currentDeviceConfiguration()
+    deviceConfiguration: DeviceConfiguration = currentDeviceConfiguration(),
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Scaffold(
         modifier = modifier

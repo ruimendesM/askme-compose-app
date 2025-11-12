@@ -17,7 +17,6 @@ import com.ruimendes.core.designsystem.components.brand.AppSuccessIcon
 import com.ruimendes.core.designsystem.components.buttons.AppButton
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
-import com.ruimendes.core.presentation.util.DeviceConfiguration
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
