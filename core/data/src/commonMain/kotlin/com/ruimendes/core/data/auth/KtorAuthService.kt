@@ -1,5 +1,6 @@
 package com.ruimendes.core.data.auth
 
+import com.ruimendes.core.data.dto.requests.EmailRequest
 import com.ruimendes.core.data.dto.requests.RegisterRequest
 import com.ruimendes.core.data.networking.post
 import com.ruimendes.core.domain.auth.AuthService
@@ -23,6 +24,13 @@ class KtorAuthService(
                 username = username,
                 password = password
             )
+        )
+    }
+
+    override suspend fun resendVerificationEmail(email: String): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/resend-verification",
+            body = EmailRequest(email)
         )
     }
 }
