@@ -145,6 +145,8 @@ fun RegisterScreen(
     }
 }
 
+// Previews
+
 @Composable
 @Preview
 private fun LightPreview() {

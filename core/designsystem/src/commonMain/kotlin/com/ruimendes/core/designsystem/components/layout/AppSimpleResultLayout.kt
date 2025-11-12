@@ -1,6 +1,7 @@
 package com.ruimendes.core.designsystem.components.layout
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,10 +21,10 @@ import com.ruimendes.core.designsystem.theme.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun AppSimpleSuccessLayout(
+fun AppSimpleResultLayout(
     title: String,
     description: String,
-    icon: @Composable () -> Unit,
+    icon: @Composable ColumnScope.() -> Unit,
     primaryButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     secondaryButton: @Composable (() -> Unit)? = null,
@@ -101,7 +102,7 @@ private fun AppSimpleSuccessLayoutPreview(
     darkTheme: Boolean,
 ) {
     AppTheme(darkTheme = darkTheme) {
-        AppSimpleSuccessLayout(
+        AppSimpleResultLayout(
             title = "Hello world!",
             description = "Test description",
             icon = {
