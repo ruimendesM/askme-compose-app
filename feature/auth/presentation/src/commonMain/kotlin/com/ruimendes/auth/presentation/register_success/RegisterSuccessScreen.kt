@@ -28,7 +28,8 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegisterSuccessRoot(
-    viewModel: RegisterSuccessViewModel = koinViewModel()
+    viewModel: RegisterSuccessViewModel = koinViewModel(),
+    onLoginClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -42,12 +43,19 @@ fun RegisterSuccessRoot(
                 )
             }
         }
-
     }
 
     RegisterSuccessScreen(
         state = state,
-        onAction = viewModel::onAction,
+        onAction = { action ->
+            when (action) {
+                is RegisterSuccessAction.OnLoginClick -> {
+                    onLoginClick()
+                }
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        },
         snackbarHostState = snackbarHostState
     )
 }
@@ -65,7 +73,10 @@ fun RegisterSuccessScreen(
         AppAdaptativeResultLayout {
             AppSimpleResultLayout(
                 title = stringResource(Res.string.account_successfully_created),
-                description = stringResource(Res.string.verification_email_sent_to_x, state.registeredEmail),
+                description = stringResource(
+                    Res.string.verification_email_sent_to_x,
+                    state.registeredEmail
+                ),
                 icon = {
                     AppSuccessIcon()
                 },

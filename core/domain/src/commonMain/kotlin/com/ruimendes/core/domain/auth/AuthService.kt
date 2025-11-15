@@ -2,8 +2,15 @@ package com.ruimendes.core.domain.auth
 
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.EmptyResult
+import com.ruimendes.core.domain.util.Result
 
 interface AuthService {
+
+    suspend fun login(
+        email: String,
+        password: String
+    ): Result<AuthInfo, DataError.Remote>
+
     suspend fun register(
         email: String,
         username: String,
