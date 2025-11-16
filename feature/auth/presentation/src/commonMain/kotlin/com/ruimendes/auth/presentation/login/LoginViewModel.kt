@@ -8,6 +8,7 @@ import askme.feature.auth.presentation.generated.resources.error_email_not_verif
 import askme.feature.auth.presentation.generated.resources.error_invalid_credentials
 import com.ruimendes.auth.domain.EmailValidator
 import com.ruimendes.core.domain.auth.AuthService
+import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.onFailure
 import com.ruimendes.core.domain.util.onSuccess
@@ -27,7 +28,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -112,7 +114,13 @@ class LoginViewModel(
                     email = email,
                     password = password
                 )
-                .onSuccess { _ ->
+                .onSuccess { authInfo ->
+
+                    sessionStorage.set(authInfo)
+
+                    _state.update { it.copy(
+                        isLoggingIn = false
+                    ) }
                     eventChannel.send(LoginEvent.Success)
                 }
                 .onFailure { error ->

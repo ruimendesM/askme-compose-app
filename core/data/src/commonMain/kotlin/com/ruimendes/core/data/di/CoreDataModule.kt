@@ -1,9 +1,11 @@
 package com.ruimendes.core.data.di
 
+import com.ruimendes.core.data.auth.DataStoreSessionStorage
 import com.ruimendes.core.data.auth.KtorAuthService
 import com.ruimendes.core.data.logger.KermitLogger
 import com.ruimendes.core.data.networking.HttpClientFactory
 import com.ruimendes.core.domain.auth.AuthService
+import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.logging.AppLogger
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -16,7 +18,8 @@ val coreDataModule = module {
     includes(platformCoreDataModule)
     single<AppLogger> { KermitLogger }
     single {
-        HttpClientFactory(get()).create(get())
+        HttpClientFactory(get(), get()).create(get())
     }
     singleOf(::KtorAuthService) bind AuthService::class
+    singleOf(::DataStoreSessionStorage) bind SessionStorage::class
 }
