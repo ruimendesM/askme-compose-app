@@ -30,6 +30,7 @@ kotlin {
             implementation(projects.feature.chat.database)
 
             implementation(libs.jetbrains.compose.navigation)
+            implementation(libs.bundles.koin.common)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
