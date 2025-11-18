@@ -7,6 +7,7 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.ruimendes.auth.presentation.email_verification.EmailVerificationRoot
 import com.ruimendes.auth.presentation.email_verification.EmailVerificationScreen
+import com.ruimendes.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.ruimendes.auth.presentation.login.LoginRoot
 import com.ruimendes.auth.presentation.register.RegisterRoot
 import com.ruimendes.auth.presentation.register_success.RegisterSuccessRoot
@@ -22,7 +23,7 @@ fun NavGraphBuilder.authGraph(
             LoginRoot(
                 onLoginSuccess = onLoginSuccess,
                 onForgotPasswordClick = {
-
+                    navController.navigate(AuthGraphRoutes.ForgotPassword)
                 },
                 onCreateAccountClick = {
                     navController.navigate(AuthGraphRoutes.Register) {
@@ -93,6 +94,10 @@ fun NavGraphBuilder.authGraph(
                     }
                 }
             )
+        }
+
+        composable<AuthGraphRoutes.ForgotPassword> {
+            ForgotPasswordRoot()
         }
     }
 }
