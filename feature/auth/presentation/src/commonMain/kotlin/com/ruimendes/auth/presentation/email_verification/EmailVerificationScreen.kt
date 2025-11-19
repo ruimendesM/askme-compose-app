@@ -32,6 +32,7 @@ import com.ruimendes.core.designsystem.components.buttons.AppButton
 import com.ruimendes.core.designsystem.components.buttons.AppButtonStyle
 import com.ruimendes.core.designsystem.components.layout.AppAdaptativeResultLayout
 import com.ruimendes.core.designsystem.components.layout.AppSimpleResultLayout
+import com.ruimendes.core.designsystem.components.layout.AppSnackbarScaffold
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
 import org.jetbrains.compose.resources.stringResource
@@ -63,54 +64,55 @@ fun EmailVerificationScreen(
     state: EmailVerificationState,
     onAction: (EmailVerificationAction) -> Unit,
 ) {
+    AppSnackbarScaffold {
+        AppAdaptativeResultLayout {
+            when {
+                state.isVerifying -> {
+                    VerifyingContent(modifier = Modifier.fillMaxWidth())
+                }
 
-    AppAdaptativeResultLayout {
-        when {
-            state.isVerifying -> {
-                VerifyingContent(modifier = Modifier.fillMaxWidth())
-            }
+                state.isVerified -> {
+                    AppSimpleResultLayout(
+                        title = stringResource(Res.string.email_verified_successfully),
+                        description = stringResource(Res.string.email_verified_successfully_description),
+                        icon = {
+                            AppSuccessIcon()
+                        },
+                        primaryButton = {
+                            AppButton(
+                                text = stringResource(Res.string.login),
+                                onClick = {
+                                    onAction(EmailVerificationAction.OnLoginClick)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    )
+                }
 
-            state.isVerified -> {
-                AppSimpleResultLayout(
-                    title = stringResource(Res.string.email_verified_successfully),
-                    description = stringResource(Res.string.email_verified_successfully_description),
-                    icon = {
-                        AppSuccessIcon()
-                    },
-                    primaryButton = {
-                        AppButton(
-                            text = stringResource(Res.string.login),
-                            onClick = {
-                                onAction(EmailVerificationAction.OnLoginClick)
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                )
-            }
-
-            else -> {
-                AppSimpleResultLayout(
-                    title = stringResource(Res.string.email_verified_failed),
-                    description = stringResource(Res.string.email_verified_failed_description),
-                    icon = {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        AppFailureIcon(
-                            modifier = Modifier.size(80.dp)
-                        )
-                        Spacer(modifier = Modifier.height(32.dp))
-                    },
-                    primaryButton = {
-                        AppButton(
-                            text = stringResource(Res.string.close),
-                            onClick = {
-                                onAction(EmailVerificationAction.OnCloseClick)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            style = AppButtonStyle.SECONDARY
-                        )
-                    }
-                )
+                else -> {
+                    AppSimpleResultLayout(
+                        title = stringResource(Res.string.email_verified_failed),
+                        description = stringResource(Res.string.email_verified_failed_description),
+                        icon = {
+                            Spacer(modifier = Modifier.height(32.dp))
+                            AppFailureIcon(
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(modifier = Modifier.height(32.dp))
+                        },
+                        primaryButton = {
+                            AppButton(
+                                text = stringResource(Res.string.close),
+                                onClick = {
+                                    onAction(EmailVerificationAction.OnCloseClick)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                style = AppButtonStyle.SECONDARY
+                            )
+                        }
+                    )
+                }
             }
         }
     }

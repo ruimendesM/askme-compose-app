@@ -11,6 +11,7 @@ import com.ruimendes.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.ruimendes.auth.presentation.login.LoginRoot
 import com.ruimendes.auth.presentation.register.RegisterRoot
 import com.ruimendes.auth.presentation.register_success.RegisterSuccessRoot
+import com.ruimendes.auth.presentation.reset_password.ResetPasswordRoot
 
 fun NavGraphBuilder.authGraph(
     navController: NavController,
@@ -98,6 +99,19 @@ fun NavGraphBuilder.authGraph(
 
         composable<AuthGraphRoutes.ForgotPassword> {
             ForgotPasswordRoot()
+        }
+
+        composable<AuthGraphRoutes.ResetPassword>(
+            deepLinks = listOf(
+                navDeepLink {
+                    this.uriPattern = "https://askme.ruimendesdev.eu/api/auth/reset-password?token={token}"
+                },
+                navDeepLink {
+                    this.uriPattern = "askme://askme.ruimendesdev.eu/api/auth/reset-password?token={token}"
+                }
+            )
+        ) {
+            ResetPasswordRoot()
         }
     }
 }

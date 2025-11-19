@@ -26,6 +26,7 @@ import com.ruimendes.core.designsystem.components.brand.AppBrandLogo
 import com.ruimendes.core.designsystem.components.buttons.AppButton
 import com.ruimendes.core.designsystem.components.buttons.AppButtonStyle
 import com.ruimendes.core.designsystem.components.layout.AppAdaptiveFormLayout
+import com.ruimendes.core.designsystem.components.layout.AppSnackbarScaffold
 import com.ruimendes.core.designsystem.components.textfields.AppPasswordTextField
 import com.ruimendes.core.designsystem.components.textfields.AppTextField
 import com.ruimendes.core.designsystem.theme.AppTheme
@@ -67,70 +68,72 @@ fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit,
 ) {
-    AppAdaptiveFormLayout(
-        headerText = stringResource(Res.string.welcome_back),
-        errorText = state.error?.asString(),
-        logo = {
-            AppBrandLogo()
-        },
-        modifier = Modifier.fillMaxSize()
-    ) {
-        AppTextField(
-            state = state.emailTextFieldState,
-            placeholder = stringResource(Res.string.email_placeholder),
-            keyboardType = KeyboardType.Email,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            title = stringResource(Res.string.email)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        AppPasswordTextField(
-            state = state.passwordTextFieldState,
-            placeholder = stringResource(Res.string.password),
-            isPasswordVisible = state.isPasswordVisible,
-            onToggleVisibilityClick = {
-                onAction(LoginAction.OnTogglePasswordVisibility)
+    AppSnackbarScaffold {
+        AppAdaptiveFormLayout(
+            headerText = stringResource(Res.string.welcome_back),
+            errorText = state.error?.asString(),
+            logo = {
+                AppBrandLogo()
             },
-            title = stringResource(Res.string.password),
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxSize()
+        ) {
+            AppTextField(
+                state = state.emailTextFieldState,
+                placeholder = stringResource(Res.string.email_placeholder),
+                keyboardType = KeyboardType.Email,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(Res.string.email)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = stringResource(Res.string.forgot_password),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.align(Alignment.End)
-                .clickable {
-                    onAction(LoginAction.OnForgotPasswordClick)
-                }
-        )
+            AppPasswordTextField(
+                state = state.passwordTextFieldState,
+                placeholder = stringResource(Res.string.password),
+                isPasswordVisible = state.isPasswordVisible,
+                onToggleVisibilityClick = {
+                    onAction(LoginAction.OnTogglePasswordVisibility)
+                },
+                title = stringResource(Res.string.password),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        AppButton(
-            text = stringResource(Res.string.login),
-            onClick = {
-                onAction(LoginAction.OnLoginClick)
-            },
-            enabled = state.canLogin,
-            isLoading = state.isLoggingIn,
-            modifier = Modifier.fillMaxWidth()
-        )
+            Text(
+                text = stringResource(Res.string.forgot_password),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.align(Alignment.End)
+                    .clickable {
+                        onAction(LoginAction.OnForgotPasswordClick)
+                    }
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        AppButton(
-            text = stringResource(Res.string.create_account),
-            onClick = {
-                onAction(LoginAction.OnSignUpClick)
-            },
-            style = AppButtonStyle.SECONDARY,
-            modifier = Modifier.fillMaxWidth()
-        )
+            AppButton(
+                text = stringResource(Res.string.login),
+                onClick = {
+                    onAction(LoginAction.OnLoginClick)
+                },
+                enabled = state.canLogin,
+                isLoading = state.isLoggingIn,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AppButton(
+                text = stringResource(Res.string.create_account),
+                onClick = {
+                    onAction(LoginAction.OnSignUpClick)
+                },
+                style = AppButtonStyle.SECONDARY,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

@@ -35,6 +35,7 @@ import com.ruimendes.core.designsystem.components.brand.AppBrandLogo
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
 import com.ruimendes.core.presentation.util.DeviceConfiguration
+import com.ruimendes.core.presentation.util.clearFocusOnTap
 import com.ruimendes.core.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -57,6 +58,7 @@ fun AppAdaptiveFormLayout(
         DeviceConfiguration.MOBILE_PORTRAIT -> {
             AppSurface(
                 modifier = modifier
+                    .clearFocusOnTap()
                     .consumeWindowInsets(WindowInsets.navigationBars)
                     .consumeWindowInsets(WindowInsets.displayCutout),
                 header = {
