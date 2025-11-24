@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ruimendes.askme.navigation.DeepLinkListener
 import com.ruimendes.askme.navigation.NavigationRoot
 import com.ruimendes.auth.presentation.navigation.AuthGraphRoutes
-import com.ruimendes.chat.presentation.chat_list.ChatListRoute
+import com.ruimendes.chat.presentation.navigation.ChatGraphRoutes
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.presentation.util.ObserveAsEvents
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -48,7 +48,7 @@ fun App(
             NavigationRoot(
                 navController = navController,
                 startDestination = if (state.isLoggedIn) {
-                    ChatListRoute
+                    ChatGraphRoutes.Graph
                 } else {
                     AuthGraphRoutes.Graph
                 }
