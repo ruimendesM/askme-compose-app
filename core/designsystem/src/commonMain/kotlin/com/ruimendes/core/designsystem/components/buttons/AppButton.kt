@@ -63,8 +63,8 @@ fun AppButton(
             ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.extended.textSecondary,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = MaterialTheme.colorScheme.extended.textDisabled
+                disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled,
+                disabledContainerColor = Color.Transparent
             )
         }
         AppButtonStyle.DESTRUCTIVE_SECONDARY -> {
@@ -169,7 +169,7 @@ fun AppSecondaryButtonPreview() {
         AppButton(
             text = "Secondary Button",
             onClick = {},
-            style = AppButtonStyle.SECONDARY
+            style = AppButtonStyle.SECONDARY,
         )
     }
 }

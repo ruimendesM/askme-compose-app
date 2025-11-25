@@ -2,7 +2,6 @@ package com.ruimendes.core.designsystem.components.avatar
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,7 +11,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AppStackedAvatars(
-    avatars: List<AvatarUi>,
+    avatars: List<ChatParticipantUi>,
     modifier: Modifier = Modifier,
     size: AvatarSize = AvatarSize.SMALL,
     maxVisible: Int = 2,
@@ -52,22 +51,22 @@ fun AppStackedAvatarsPreview() {
     AppTheme {
         AppStackedAvatars(
             avatars = listOf(
-                AvatarUi(
+                ChatParticipantUi(
                     id = "1",
                     username = "Rui",
                     initials = "RM"
                 ),
-                AvatarUi(
+                ChatParticipantUi(
                     id = "3",
                     username = "John",
                     initials = "JW"
                 ),
-                AvatarUi(
+                ChatParticipantUi(
                     id = "2",
                     username = "Sabrina",
                     initials = "SA"
                 ),
-                AvatarUi(
+                ChatParticipantUi(
                     id = "4",
                     username = "Amanda",
                     initials = "AN"
