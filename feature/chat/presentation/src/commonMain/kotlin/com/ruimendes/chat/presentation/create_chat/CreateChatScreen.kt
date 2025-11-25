@@ -18,10 +18,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.cancel
 import askme.feature.chat.presentation.generated.resources.create_chat
+import com.ruimendes.chat.domain.models.Chat
 import com.ruimendes.chat.presentation.components.ChatParticipantSearchTextSection
 import com.ruimendes.chat.presentation.components.ChatParticipantsSelectionSection
 import com.ruimendes.chat.presentation.components.ManageChatButtonSection
@@ -32,6 +32,7 @@ import com.ruimendes.core.designsystem.components.buttons.AppButtonStyle
 import com.ruimendes.core.designsystem.components.dialogs.AppAdaptativeDialogSheetLayout
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.presentation.util.DeviceConfiguration
+import com.ruimendes.core.presentation.util.ObserveAsEvents
 import com.ruimendes.core.presentation.util.clearFocusOnTap
 import com.ruimendes.core.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.resources.stringResource
@@ -40,18 +41,30 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CreateChatRoot(
+    onDismiss: () -> Unit,
+    onChatCreated: (Chat) -> Unit,
     viewModel: CreateChatViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    AppAdaptativeDialogSheetLayout(
-        onDismiss = {
-            viewModel.onAction(CreateChatAction.OnDismissDialog)
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is CreateChatEvent.OnChatCreated -> onChatCreated(event.chat)
         }
+    }
+
+    AppAdaptativeDialogSheetLayout(
+        onDismiss = onDismiss
     ) {
         CreateChatScreen(
             state = state,
-            onAction = viewModel::onAction
+            onAction = { action ->
+                when (action) {
+                    CreateChatAction.OnDismissDialog -> onDismiss()
+                    else -> Unit
+                }
+                viewModel.onAction(action)
+            }
         )
     }
 }
@@ -99,7 +112,7 @@ fun CreateChatScreen(
                 onAction(CreateChatAction.OnAddClick)
             },
             isSearchEnabled = state.canAddParticipant,
-            isLoading = state.isAddingParticipants,
+            isLoading = state.isSearching,
             modifier = Modifier.fillMaxWidth(),
             error = state.searchError,
             onFocusChanged = {
@@ -133,6 +146,7 @@ fun CreateChatScreen(
                     style = AppButtonStyle.SECONDARY
                 )
             },
+            error = state.createChatError?.asString(),
             modifier = Modifier.fillMaxWidth()
         )
     }

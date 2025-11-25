@@ -1,6 +1,7 @@
 package com.ruimendes.askme.di
 
 import com.ruimendes.auth.presentation.di.authPresentationModule
+import com.ruimendes.chat.data.di.chatDataModule
 import com.ruimendes.chat.presentation.di.chatPresentationModule
 import com.ruimendes.core.data.di.coreDataModule
 import com.ruimendes.core.presentation.di.corePresentationModule
@@ -15,7 +16,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             coreDataModule,
             corePresentationModule,
             authPresentationModule,
-            chatPresentationModule
+            chatPresentationModule,
+            chatDataModule
         )
     }
 }
