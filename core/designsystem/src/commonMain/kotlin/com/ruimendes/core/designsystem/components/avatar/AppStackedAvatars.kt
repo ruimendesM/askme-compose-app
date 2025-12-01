@@ -11,7 +11,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AppStackedAvatars(
-    avatars: List<ChatParticipantUi>,
+    avatars: List<ChatParticipantUI>,
     modifier: Modifier = Modifier,
     size: AvatarSize = AvatarSize.SMALL,
     maxVisible: Int = 2,
@@ -51,22 +51,22 @@ fun AppStackedAvatarsPreview() {
     AppTheme {
         AppStackedAvatars(
             avatars = listOf(
-                ChatParticipantUi(
+                ChatParticipantUI(
                     id = "1",
                     username = "Rui",
                     initials = "RM"
                 ),
-                ChatParticipantUi(
+                ChatParticipantUI(
                     id = "3",
                     username = "John",
                     initials = "JW"
                 ),
-                ChatParticipantUi(
+                ChatParticipantUI(
                     id = "2",
                     username = "Sabrina",
                     initials = "SA"
                 ),
-                ChatParticipantUi(
+                ChatParticipantUI(
                     id = "4",
                     username = "Amanda",
                     initials = "AN"
