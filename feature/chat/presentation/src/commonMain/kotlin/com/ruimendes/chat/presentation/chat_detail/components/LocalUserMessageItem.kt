@@ -1,0 +1,97 @@
+package com.ruimendes.chat.presentation.chat_detail.components
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import askme.core.designsystem.generated.resources.logout_icon
+import askme.core.designsystem.generated.resources.settings_icon
+import askme.feature.chat.presentation.generated.resources.Res
+import askme.feature.chat.presentation.generated.resources.delete_for_everyone
+import askme.feature.chat.presentation.generated.resources.logout
+import askme.feature.chat.presentation.generated.resources.profile_settings
+import askme.feature.chat.presentation.generated.resources.reload_icon
+import askme.feature.chat.presentation.generated.resources.retry
+import askme.feature.chat.presentation.generated.resources.username_you
+import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
+import com.ruimendes.chat.presentation.model.MessageUI
+import com.ruimendes.core.designsystem.components.chat.AppChatBubble
+import com.ruimendes.core.designsystem.components.chat.TrianglePosition
+import com.ruimendes.core.designsystem.components.dropdown.AppDropDownMenu
+import com.ruimendes.core.designsystem.components.dropdown.DropDownItem
+import com.ruimendes.core.designsystem.theme.extended
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+
+@Composable
+fun LocalUserMessageItem(
+    message: MessageUI.LocalUserMessage,
+    onMessageLongClick: () -> Unit,
+    onDismissMessageMenu: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+    ) {
+        Box(
+            modifier = Modifier.weight(1.0f)
+        ) {
+            AppChatBubble(
+                messageContent = message.content,
+                sender = stringResource(Res.string.username_you),
+                formattedDateTime = message.formattedSentTime.asString(),
+                trianglePosition = TrianglePosition.RIGHT,
+                messageStatus = {
+                    MessageStatusIndicator(
+                        status = message.deliveryStatus
+                    )
+                },
+                onLongClick = onMessageLongClick
+            )
+
+            AppDropDownMenu(
+                isOpen = message.isMenuOpen,
+                onDismiss = onDismissMessageMenu,
+                items = listOf(
+                    DropDownItem(
+                        title = stringResource(Res.string.delete_for_everyone),
+                        icon = Icons.Default.Delete,
+                        contentColor = MaterialTheme.colorScheme.extended.destructiveHover,
+                        onClick = onDeleteClick
+                    ),
+                )
+            )
+        }
+
+        if (message.deliveryStatus == ChatMessageDeliveryStatus.FAILED) {
+            IconButton(
+                onClick = onRetryClick
+            ) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.reload_icon),
+                    contentDescription = stringResource(Res.string.retry),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
