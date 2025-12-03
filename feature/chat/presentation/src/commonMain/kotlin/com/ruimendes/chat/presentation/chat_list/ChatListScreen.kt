@@ -25,17 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.cancel
 import askme.feature.chat.presentation.generated.resources.create_chat
 import askme.feature.chat.presentation.generated.resources.logout
 import askme.feature.chat.presentation.generated.resources.logout_confirmation_description
 import askme.feature.chat.presentation.generated.resources.logout_confirmation_title
-import com.ruimendes.chat.domain.models.Chat
+import askme.feature.chat.presentation.generated.resources.no_chats
+import askme.feature.chat.presentation.generated.resources.no_chats_subtitle
 import com.ruimendes.chat.presentation.chat_list.components.ChatListHeader
 import com.ruimendes.chat.presentation.chat_list.components.ChatListItemUI
-import com.ruimendes.chat.presentation.chat_list.components.EmptyChatSection
+import com.ruimendes.chat.presentation.components.EmptyListSection
 import com.ruimendes.chat.presentation.model.ChatUI
 import com.ruimendes.core.designsystem.components.brand.AppHorizontalDivider
 import com.ruimendes.core.designsystem.components.buttons.AppFloatingActionButton
@@ -129,7 +129,9 @@ fun ChatListScreen(
                 }
 
                 state.chats.isEmpty() -> {
-                    EmptyChatSection(
+                    EmptyListSection(
+                        title = stringResource(Res.string.no_chats),
+                        description = stringResource(Res.string.no_chats_subtitle),
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
