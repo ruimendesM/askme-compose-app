@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.presentation.model.MessageUI
+import com.ruimendes.chat.presentation.util.getChatBubbleColorForUser
 import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
@@ -21,7 +22,7 @@ import com.ruimendes.core.presentation.util.UiText
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun MessageListItemUI(
+fun MessageListItem(
     messageUI: MessageUI,
     onMessageLongClick: (MessageUI.LocalUserMessage) -> Unit,
     onDismissMessageMenu: () -> Unit,
@@ -52,7 +53,10 @@ fun MessageListItemUI(
             }
 
             is MessageUI.OtherUserMessage -> {
-                OtherUserMessageItem(message = messageUI)
+                OtherUserMessageItem(
+                    message = messageUI,
+                    color = getChatBubbleColorForUser(messageUI.sender.id),
+                )
             }
         }
     }
@@ -82,7 +86,7 @@ private fun DateSeparatorItem(
 @Preview
 fun MessageListItemLocalMessageUIPreview() {
     AppTheme {
-        MessageListItemUI(
+        MessageListItem(
             messageUI = MessageUI.LocalUserMessage(
                 id = "1",
                 content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",
@@ -105,7 +109,7 @@ fun MessageListItemLocalMessageUIPreview() {
 @Preview
 fun MessageListItemLocalMessageFailedUIPreview() {
     AppTheme {
-        MessageListItemUI(
+        MessageListItem(
             messageUI = MessageUI.LocalUserMessage(
                 id = "1",
                 content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",
@@ -127,7 +131,7 @@ fun MessageListItemLocalMessageFailedUIPreview() {
 @Preview
 fun MessageListItemOtherMessageUIPreview() {
     AppTheme {
-        MessageListItemUI(
+        MessageListItem(
             messageUI = MessageUI.OtherUserMessage(
                 id = "1",
                 content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",

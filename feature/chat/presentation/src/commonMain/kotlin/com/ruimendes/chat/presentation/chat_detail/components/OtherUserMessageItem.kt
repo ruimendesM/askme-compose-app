@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ruimendes.chat.presentation.model.MessageUI
 import com.ruimendes.core.designsystem.components.avatar.AppAvatarPhoto
@@ -15,6 +16,7 @@ import com.ruimendes.core.designsystem.components.chat.TrianglePosition
 @Composable
 fun OtherUserMessageItem(
     message: MessageUI.OtherUserMessage,
+    color: Color,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -31,7 +33,8 @@ fun OtherUserMessageItem(
             messageContent = message.content,
             sender = message.sender.username,
             trianglePosition = TrianglePosition.LEFT,
-            formattedDateTime = message.formattedSentTime.asString()
+            formattedDateTime = message.formattedSentTime.asString(),
+            color = color
         )
     }
     

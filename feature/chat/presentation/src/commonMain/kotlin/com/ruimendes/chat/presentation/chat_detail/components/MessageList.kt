@@ -17,9 +17,7 @@ import askme.feature.chat.presentation.generated.resources.no_messages
 import askme.feature.chat.presentation.generated.resources.no_messages_subtitle
 import com.ruimendes.chat.presentation.components.EmptyListSection
 import com.ruimendes.chat.presentation.model.MessageUI
-import com.ruimendes.core.designsystem.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MessageList(
@@ -54,7 +52,7 @@ fun MessageList(
                 items = messages,
                 key = { it.id }
             ) { message ->
-                MessageListItemUI(
+                MessageListItem(
                     messageUI = message,
                     onMessageLongClick = onMessageLongClick,
                     onDeleteClick = onDeleteMessageClick,
