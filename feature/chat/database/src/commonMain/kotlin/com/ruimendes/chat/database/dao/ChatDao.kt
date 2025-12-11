@@ -37,6 +37,7 @@ interface ChatDao {
         DESC
     """
     )
+    @Transaction
     fun getChatWithParticipants(): Flow<List<ChatWithParticipants>>
 
     @Query(
@@ -46,6 +47,7 @@ interface ChatDao {
         WHERE chatId = :chatId
     """
     )
+    @Transaction
     suspend fun getChatById(chatId: String): ChatWithParticipants?
 
     @Query(
@@ -97,6 +99,7 @@ interface ChatDao {
         WHERE chatId = :chatId
     """
     )
+    @Transaction
     fun getChatInfoById(chatId: String): Flow<ChatInfoEntity?>
 
     @Transaction
