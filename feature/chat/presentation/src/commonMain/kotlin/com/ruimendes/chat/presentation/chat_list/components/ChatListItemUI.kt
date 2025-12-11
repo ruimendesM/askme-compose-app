@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.ruimendes.chat.domain.models.ChatMessage
+import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.presentation.components.ChatItemHeaderRow
 import com.ruimendes.chat.presentation.model.ChatUI
 import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
@@ -127,7 +128,8 @@ fun ChatListItemUIPreview() {
                     chatId = "1",
                     content = "This is a last message chat message that was sent to the chat and is very long so we can test the UI",
                     createdAt = Clock.System.now(),
-                    senderId = "1"
+                    senderId = "1",
+                    deliveryStatus = ChatMessageDeliveryStatus.SENT
                 ),
                 lastMessageSenderUsername = "Rui"
             )

@@ -28,6 +28,7 @@ import askme.feature.chat.presentation.generated.resources.leave_chat
 import askme.feature.chat.presentation.generated.resources.open_chat_options_menu
 import askme.feature.chat.presentation.generated.resources.users_icon
 import com.ruimendes.chat.domain.models.ChatMessage
+import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.presentation.components.ChatHeader
 import com.ruimendes.chat.presentation.components.ChatItemHeaderRow
 import com.ruimendes.chat.presentation.model.ChatUI
@@ -159,7 +160,8 @@ fun ChatDetailHeaderPreview() {
                             chatId = "1",
                             content = "This is a last message chat message that was sent to the chat and is very long so we can test the UI",
                             createdAt = Clock.System.now(),
-                            senderId = "1"
+                            senderId = "1",
+                            deliveryStatus = ChatMessageDeliveryStatus.SENT
                         ),
                         lastMessageSenderUsername = "Rui"
                     ),

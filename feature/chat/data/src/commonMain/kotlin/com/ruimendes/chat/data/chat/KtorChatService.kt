@@ -5,6 +5,7 @@ import com.ruimendes.chat.data.dto.request.CreateChatRequest
 import com.ruimendes.chat.data.mappers.toDomain
 import com.ruimendes.chat.domain.chat.ChatService
 import com.ruimendes.chat.domain.models.Chat
+import com.ruimendes.core.data.networking.get
 import com.ruimendes.core.data.networking.post
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.Result
@@ -20,6 +21,14 @@ class KtorChatService(
             route = "/chat",
             body = CreateChatRequest(otherUserIds)
         ).map { it.toDomain() }
+    }
+
+    override suspend fun getChats(): Result<List<Chat>, DataError.Remote> {
+        return httpClient.get<List<ChatDto>>(
+            route = "/chat"
+        ).map { chatDtos ->
+            chatDtos.map { it.toDomain() }
+        }
     }
 
 }
