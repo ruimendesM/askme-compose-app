@@ -30,7 +30,10 @@ class ChatListViewModel(
             return@combine ChatListState()
         }
         currentState.copy(
-            chats = chats.map { it.toUi(authInfo.user.id) },
+            // TODO revisit filter here - how to handle chats with no other participants
+            chats = chats
+                .map { it.toUi(authInfo.user.id) }
+                .filter { it.otherParticipants.isNotEmpty() },
             localParticipant = authInfo.user.toUi()
         )
     }
@@ -55,6 +58,7 @@ class ChatListViewModel(
                     )
                 }
             }
+
             else -> Unit
         }
     }

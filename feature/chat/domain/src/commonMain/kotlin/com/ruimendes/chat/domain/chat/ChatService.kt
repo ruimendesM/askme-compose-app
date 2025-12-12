@@ -2,6 +2,7 @@ package com.ruimendes.chat.domain.chat
 
 import com.ruimendes.chat.domain.models.Chat
 import com.ruimendes.core.domain.util.DataError
+import com.ruimendes.core.domain.util.EmptyResult
 import com.ruimendes.core.domain.util.Result
 
 interface ChatService {
@@ -12,4 +13,6 @@ interface ChatService {
     suspend fun getChats(): Result<List<Chat>, DataError.Remote>
 
     suspend fun getChatById(chatId: String): Result<Chat, DataError.Remote>
+
+    suspend fun leaveChat(chatId: String): EmptyResult<DataError.Remote>
 }

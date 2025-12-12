@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.error_participant_not_found
 import com.ruimendes.chat.domain.chat.ChatParticipantService
+import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.chat.ChatService
 import com.ruimendes.chat.presentation.mappers.toUi
 import com.ruimendes.core.domain.util.DataError
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(FlowPreview::class)
 class CreateChatViewModel(
     private val chatParticipantService: ChatParticipantService,
-    private val chatService: ChatService
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -79,7 +80,7 @@ class CreateChatViewModel(
                 canAddParticipant = false
             ) }
 
-            chatService
+            chatRepository
                 .createChat(userIds)
                 .onSuccess { chat ->
                     _state.update {
