@@ -1,6 +1,7 @@
 package com.ruimendes.chat.presentation.chat_detail
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -23,6 +24,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -164,28 +166,37 @@ fun ChatDetailScreen(
                             onSendClick = {
                                 onAction(ChatDetailAction.OnSendMessageClick)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    vertical = 8.dp,
+                                    horizontal = 16.dp
+                                )
                         )
                     }
                 }
-            }
+                if (configuration.isWideScreen) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
-            if (configuration.isWideScreen) {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            AnimatedVisibility(
-                visible = configuration.isWideScreen && state.chat != null
-            ) {
-                MessageBox(
-                    messageTextFieldState = state.messageTextFieldState,
-                    isTextInputEnabled = state.canSendMessage,
-                    connectionState = state.connectionState,
-                    onSendClick = {
-                        onAction(ChatDetailAction.OnSendMessageClick)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                AnimatedVisibility(
+                    visible = configuration.isWideScreen && state.chat != null
+                ) {
+                    DynamicRoundedCornerColumn(
+                        isCornersRounded = configuration.isWideScreen,
+                    ) {
+                        MessageBox(
+                            messageTextFieldState = state.messageTextFieldState,
+                            isTextInputEnabled = state.canSendMessage,
+                            connectionState = state.connectionState,
+                            onSendClick = {
+                                onAction(ChatDetailAction.OnSendMessageClick)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                    }
+                }
             }
         }
     }
@@ -200,8 +211,13 @@ private fun DynamicRoundedCornerColumn(
     Column(
         modifier = modifier
             .shadow(
-                elevation = if (isCornersRounded) 4.dp else 0.dp,
-                shape = if (isCornersRounded) RoundedCornerShape(16.dp) else RectangleShape,
+                elevation = if (isCornersRounded) 8.dp else 0.dp,
+                shape = if (isCornersRounded) RoundedCornerShape(24.dp) else RectangleShape,
+                spotColor = Color.Black.copy(alpha = 0.2f)
+            )
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = if (isCornersRounded) RoundedCornerShape(24.dp) else RectangleShape
             )
     ) {
         content()

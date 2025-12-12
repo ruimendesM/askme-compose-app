@@ -131,7 +131,10 @@ fun AppButton(
                 color = Color.Black
             )
             Row(
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(
+                    8.dp,
+                    Alignment.CenterHorizontally
+                ),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.alpha(
                     if(isLoading) 0f else 1f

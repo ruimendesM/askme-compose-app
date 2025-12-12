@@ -99,7 +99,7 @@ interface ChatDao {
             SELECT p.*
             FROM chatparticipantentity p
             JOIN chatparticipantcrossref cpcr ON p.userId = cpcr.userId
-            WHERE cpcr.chatId = :chatId AND cpcr.isActive = true
+            WHERE cpcr.chatId = :chatId AND cpcr.isActive = 1
             ORDER BY p.username
         """
     )
@@ -107,9 +107,10 @@ interface ChatDao {
 
     @Query(
         """
-        SELECT *
-        FROM chatentity
-        WHERE chatId = :chatId
+        SELECT c.*
+        FROM chatentity c
+        JOIN chatparticipantcrossref cpcr ON c.chatId = cpcr.chatId
+        WHERE c.chatId = :chatId AND cpcr.isActive = 1
     """
     )
     @Transaction
