@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ruimendes.core.designsystem.components.avatar.AppAvatarPhoto
 import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
+import com.ruimendes.core.designsystem.components.brand.AppHorizontalDivider
 import com.ruimendes.core.designsystem.theme.extended
 import com.ruimendes.core.designsystem.theme.titleXSmall
 import com.ruimendes.core.presentation.util.DeviceConfiguration
@@ -27,6 +28,7 @@ import com.ruimendes.core.presentation.util.currentDeviceConfiguration
 
 @Composable
 fun ColumnScope.ChatParticipantsSelectionSection(
+    existingParticipants: List<ChatParticipantUI>,
     selectedParticipants: List<ChatParticipantUI>,
     modifier: Modifier = Modifier,
     searchResult: ChatParticipantUI? = null
@@ -52,6 +54,22 @@ fun ColumnScope.ChatParticipantsSelectionSection(
         LazyColumn(
             modifier = Modifier.fillMaxWidth()
         ) {
+            items(
+                items = existingParticipants,
+                key = { "existing_${it.id}" }
+            ) { participant ->
+                ChatParticipantListItem(
+                    participant = participant,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            if (existingParticipants.isNotEmpty()) {
+                item {
+                    AppHorizontalDivider()
+                }
+            }
+
             searchResult?.let {
                 item {
                     ChatParticipantListItem(

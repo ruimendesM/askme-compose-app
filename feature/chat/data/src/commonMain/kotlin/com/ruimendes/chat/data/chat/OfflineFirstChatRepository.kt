@@ -11,6 +11,7 @@ import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.chat.ChatService
 import com.ruimendes.chat.domain.models.Chat
 import com.ruimendes.chat.domain.models.ChatInfo
+import com.ruimendes.chat.domain.models.ChatParticipant
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.EmptyResult
 import com.ruimendes.core.domain.util.Result
@@ -65,6 +66,13 @@ class OfflineFirstChatRepository(
             .map { it.toDomain() }
     }
 
+    override fun getActiveParticipantsByChatId(chatId: String): Flow<List<ChatParticipant>> {
+        return db.chatDao.getActiveParticipantsByChatId(chatId)
+            .map { participants ->
+                participants.map { it.toDomain() }
+            }
+    }
+
     override suspend fun fetchChats(): Result<List<Chat>, DataError.Remote> {
         return chatService
             .getChats()
@@ -104,6 +112,17 @@ class OfflineFirstChatRepository(
             .leaveChat(chatId)
             .onSuccess {
                 db.chatDao.deleteChatById(chatId)
+            }
+    }
+
+    override suspend fun addParticipantsToChat(
+        chatId: String,
+        userIds: List<String>
+    ): Result<Chat, DataError.Remote> {
+        return chatService
+            .addParticipantsToChat(chatId, userIds)
+            .onSuccess {
+                upsertChatOnDB(it)
             }
     }
 
