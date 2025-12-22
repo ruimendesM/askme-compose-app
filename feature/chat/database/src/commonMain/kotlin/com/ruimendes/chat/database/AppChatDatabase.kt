@@ -1,5 +1,6 @@
 package com.ruimendes.chat.database
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.ruimendes.chat.database.dao.ChatDao
@@ -24,6 +25,7 @@ import com.ruimendes.chat.database.view.LastMessageView
     ],
     version = 1
 )
+@ConstructedBy(AppChatDatabaseConstructor::class)
 abstract class AppChatDatabase: RoomDatabase() {
     abstract val chatDao: ChatDao
     abstract val chatParticipantDao: ChatParticipantDao
