@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     alias(libs.plugins.convention.kmp.library)
     alias(libs.plugins.convention.buildkonfig)
@@ -49,4 +51,13 @@ kotlin {
         }
     }
 
+    targets.withType<KotlinNativeTarget> {
+        compilations.getByName("main") {
+            cinterops {
+                create("network") {
+                    defFile(file("src/nativeInterop/cinterop/network.def"))
+                }
+            }
+        }
+    }
 }
