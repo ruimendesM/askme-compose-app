@@ -47,4 +47,14 @@ interface ChatMessageDao {
         """
     )
     suspend fun getMessageById(messageId: String): ChatMessageEntity?
+
+    @Query(
+        """
+        UPDATE chatmessageentity
+        SET deliveryStatus = :status, deliveryStatusTimestamp = :timestamp
+        WHERE messageId = :messageId
+    """
+    )
+    suspend fun updateDeliveryStatus(messageId: String, status: String, timestamp: Long)
+
 }

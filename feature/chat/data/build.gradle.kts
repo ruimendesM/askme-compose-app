@@ -24,6 +24,9 @@ kotlin {
 
                 implementation(libs.bundles.ktor.common)
                 implementation(libs.koin.core)
+
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.sqlite.bundled)
             }
         }
 
