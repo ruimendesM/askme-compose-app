@@ -3,7 +3,11 @@ package com.ruimendes.chat.presentation.chat_detail
 import androidx.compose.foundation.text.input.clearText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ruimendes.chat.domain.chat.ChatConnectionClient
 import com.ruimendes.chat.domain.chat.ChatRepository
+import com.ruimendes.chat.domain.message.MessageRepository
+import com.ruimendes.chat.domain.models.ConnectionState
+import com.ruimendes.chat.presentation.mappers.toUI
 import com.ruimendes.chat.presentation.mappers.toUi
 import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.util.onFailure
@@ -14,8 +18,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -25,7 +33,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatDetailViewModel(
     private val chatRepository: ChatRepository,
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val messageRepository: MessageRepository,
+    private val connectionClient: ChatConnectionClient
 ) : ViewModel() {
 
     private val eventChannel = Channel<ChatDetailEvent>()
@@ -67,7 +77,8 @@ class ChatDetailViewModel(
         }
         .onStart {
             if (!hasLoadedInitialData) {
-                /** Load initial data here **/
+                observeConnectionState()
+                observeChatMessages()
                 hasLoadedInitialData = true
             }
         }
@@ -92,6 +103,67 @@ class ChatDetailViewModel(
             ChatDetailAction.OnScrollToTop -> {}
             ChatDetailAction.OnSendMessageClick -> {}
         }
+    }
+
+    private fun observeChatMessages() {
+        val currentMessages = state
+            .map { it.messages }
+            .distinctUntilChanged()
+
+        val newMessages = _chatId
+            .flatMapLatest { chatId ->
+                if (chatId != null) {
+                    messageRepository
+                        .getMessagesForChat(chatId)
+                } else {
+                    emptyFlow()
+                }
+            }
+            .combine(sessionStorage.observeAuthInfo()) { messages, authInfo ->
+                if (authInfo == null) {
+                    return@combine messages
+                }
+                _state.update {
+                    it.copy(
+                        messages = messages.map { it.toUI(authInfo.user.id) }
+                    )
+                }
+                messages
+            }
+
+        val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
+
+        combine(
+            currentMessages,
+            newMessages,
+            isNearBottom
+        ) { currentMessages, newMessages, isNearBottom ->
+            val lastNewId = newMessages.lastOrNull()?.message?.id
+            val lastCurrentId = currentMessages.lastOrNull()?.id
+
+            if (lastNewId != lastCurrentId && isNearBottom) {
+                eventChannel.send(ChatDetailEvent.OnNewMessage)
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun observeConnectionState() {
+        connectionClient
+            .connectionState
+            .onEach { connectionState ->
+                if (connectionState == ConnectionState.CONNECTED) {
+                    _chatId.value?.let {
+                        messageRepository.fetchMessages(it, before = null)
+                    }
+                }
+
+                _state.update {
+                    it.copy(
+                        connectionState = connectionState
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun onLeaveChatClick() {

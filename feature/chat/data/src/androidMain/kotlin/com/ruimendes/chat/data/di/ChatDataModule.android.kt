@@ -1,6 +1,7 @@
 package com.ruimendes.chat.data.di
 
 import com.ruimendes.chat.data.lifecycle.AppLifecycleObserver
+import com.ruimendes.chat.data.network.ConnectionErrorHandler
 import com.ruimendes.chat.data.network.ConnectivityObserver
 import com.ruimendes.chat.database.DatabaseFactory
 import org.koin.android.ext.koin.androidContext
@@ -11,4 +12,5 @@ actual val platformChatDataModule = module {
     single { DatabaseFactory(androidContext()) }
     singleOf(::AppLifecycleObserver)
     singleOf(::ConnectivityObserver)
+    singleOf(::ConnectionErrorHandler)
 }
