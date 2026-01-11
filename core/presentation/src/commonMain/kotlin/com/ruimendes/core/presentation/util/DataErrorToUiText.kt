@@ -13,6 +13,7 @@ import askme.core.presentation.generated.resources.error_serialization
 import askme.core.presentation.generated.resources.error_server
 import askme.core.presentation.generated.resources.error_service_unavailable
 import askme.core.presentation.generated.resources.error_too_many_requests
+import askme.core.presentation.generated.resources.error_unable_to_send_message
 import askme.core.presentation.generated.resources.error_unauthorized
 import askme.core.presentation.generated.resources.error_unknown
 import com.ruimendes.core.domain.util.DataError
@@ -35,6 +36,8 @@ fun DataError.toUiText(): UiText {
         DataError.Remote.SERVICE_UNAVAILABLE -> Res.string.error_service_unavailable
         DataError.Remote.SERIALIZATION_ERROR -> Res.string.error_serialization
         DataError.Remote.UNKNOWN -> Res.string.error_unknown
+        DataError.Connection.NOT_CONNECTED -> Res.string.error_no_internet
+        DataError.Connection.MESSAGE_SEND_FAILED -> Res.string.error_unable_to_send_message
     }
     return UiText.Resource(resource)
 }

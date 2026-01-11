@@ -2,11 +2,11 @@ package com.ruimendes.chat.data.network
 
 import com.ruimendes.chat.data.dto.websocket.WebSocketMessageDto
 import com.ruimendes.chat.data.lifecycle.AppLifecycleObserver
-import com.ruimendes.chat.domain.error.ConnectionError
 import com.ruimendes.chat.domain.models.ConnectionState
 import com.ruimendes.core.data.networking.UrlConstants
 import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.logging.AppLogger
+import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.EmptyResult
 import com.ruimendes.core.domain.util.Result
 import io.ktor.client.HttpClient
@@ -206,11 +206,11 @@ class KtorWebSocketConnector(
         }
     }
 
-    suspend fun sendMessage(message: String): EmptyResult<ConnectionError> {
+    suspend fun sendMessage(message: String): EmptyResult<DataError.Connection> {
         val connectionState = connectionState.value
 
         if (currentSession == null || connectionState != ConnectionState.CONNECTED) {
-            return Result.Failure(ConnectionError.NOT_CONNECTED)
+            return Result.Failure(DataError.Connection.NOT_CONNECTED)
         }
 
         return try {
@@ -219,7 +219,7 @@ class KtorWebSocketConnector(
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             logger.error("Failed to send message", e)
-            Result.Failure(ConnectionError.MESSAGE_SEND_FAILED)
+            Result.Failure(DataError.Connection.MESSAGE_SEND_FAILED)
         }
     }
 }
