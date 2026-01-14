@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun LocalUserMessageItem(
     message: MessageUI.LocalUserMessage,
+    messageWithOpenMenu: MessageUI.LocalUserMessage?,
     onMessageLongClick: () -> Unit,
     onDismissMessageMenu: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -57,7 +58,7 @@ fun LocalUserMessageItem(
             )
 
             AppDropDownMenu(
-                isOpen = message.isMenuOpen,
+                isOpen = messageWithOpenMenu?.id == message.id,
                 onDismiss = onDismissMessageMenu,
                 items = listOf(
                     DropDownItem(

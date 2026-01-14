@@ -123,10 +123,20 @@ class OfflineFirstMessageRepository(
                             timestamp = Clock.System.now().toEpochMilliseconds(),
                             status = ChatMessageDeliveryStatus.FAILED.name
                         )
-                    }
+                    }.join()
                 }
 
         }
+    }
+
+    override suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote> {
+        return chatMessageService
+            .deleteMessage(messageId)
+            .onSuccess {
+                applicationScope.launch {
+                    database.chatMessageDao.deleteMessageById(messageId)
+                }.join()
+            }
     }
 
     override fun getMessagesForChat(chatId: String): Flow<List<MessageWithSender>> {

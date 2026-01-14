@@ -4,11 +4,14 @@ import com.ruimendes.chat.data.dto.ChatMessageDto
 import com.ruimendes.chat.data.mappers.toDomain
 import com.ruimendes.chat.domain.message.ChatMessageService
 import com.ruimendes.chat.domain.models.ChatMessage
+import com.ruimendes.core.data.networking.delete
 import com.ruimendes.core.data.networking.get
 import com.ruimendes.core.domain.util.DataError
+import com.ruimendes.core.domain.util.EmptyResult
 import com.ruimendes.core.domain.util.Result
 import com.ruimendes.core.domain.util.map
 import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
 import kotlin.text.set
 
 class KtorChatMessageService(
@@ -30,5 +33,11 @@ class KtorChatMessageService(
         ).map {
             it.map { it.toDomain() }
         }
+    }
+
+    override suspend fun deleteMessage(messageId: String): EmptyResult<DataError.Remote> {
+        return httpClient.delete(
+            route = "/messages/$messageId"
+        )
     }
 }

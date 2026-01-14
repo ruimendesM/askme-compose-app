@@ -24,6 +24,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun MessageListItem(
     messageUI: MessageUI,
+    messageWithOpenMenu: MessageUI.LocalUserMessage?,
     onMessageLongClick: (MessageUI.LocalUserMessage) -> Unit,
     onDismissMessageMenu: () -> Unit,
     onDeleteClick: (MessageUI.LocalUserMessage) -> Unit,
@@ -45,6 +46,7 @@ fun MessageListItem(
             is MessageUI.LocalUserMessage -> {
                 LocalUserMessageItem(
                     message = messageUI,
+                    messageWithOpenMenu = messageWithOpenMenu,
                     onMessageLongClick = { onMessageLongClick(messageUI) },
                     onDismissMessageMenu = onDismissMessageMenu,
                     onDeleteClick = { onDeleteClick(messageUI) },
@@ -91,7 +93,12 @@ fun MessageListItemLocalMessageUIPreview() {
                 id = "1",
                 content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",
                 deliveryStatus = ChatMessageDeliveryStatus.SENT,
-                isMenuOpen = true,
+                formattedSentTime = UiText.DynamicString("Friday 3:45pm")
+            ),
+            messageWithOpenMenu = MessageUI.LocalUserMessage(
+                id = "1",
+                content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",
+                deliveryStatus = ChatMessageDeliveryStatus.SENT,
                 formattedSentTime = UiText.DynamicString("Friday 3:45pm")
             ),
             onMessageLongClick = {},
@@ -114,9 +121,9 @@ fun MessageListItemLocalMessageFailedUIPreview() {
                 id = "1",
                 content = "Hello! This is a very long message that should be displayed in the chat. I hope it looks good!",
                 deliveryStatus = ChatMessageDeliveryStatus.FAILED,
-                isMenuOpen = false,
                 formattedSentTime = UiText.DynamicString("Friday 3:45pm")
             ),
+            messageWithOpenMenu = null,
             onMessageLongClick = {},
             onDismissMessageMenu = {},
             onDeleteClick = {},
@@ -143,6 +150,7 @@ fun MessageListItemOtherMessageUIPreview() {
                     imageUrl = null
                 )
             ),
+            messageWithOpenMenu = null,
             onMessageLongClick = {},
             onDismissMessageMenu = {},
             onDeleteClick = {},
