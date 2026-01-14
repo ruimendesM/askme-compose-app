@@ -13,6 +13,7 @@ import com.ruimendes.chat.domain.models.ConnectionState
 import com.ruimendes.chat.domain.models.OutgoingNewMessage
 import com.ruimendes.chat.presentation.mappers.toUI
 import com.ruimendes.chat.presentation.mappers.toUi
+import com.ruimendes.chat.presentation.model.MessageUI
 import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.util.onFailure
 import com.ruimendes.core.domain.util.onSuccess
@@ -74,7 +75,8 @@ class ChatDetailViewModel(
         }
 
         currentState.copy(
-            chat = chatInfo.chat.toUi(authInfo.user.id)
+            chat = chatInfo.chat.toUi(authInfo.user.id),
+            messages = chatInfo.messages.map { it.toUI(authInfo.user.id) }
         )
     }
 
@@ -111,9 +113,19 @@ class ChatDetailViewModel(
             ChatDetailAction.OnDismissMessageMenu -> {}
             ChatDetailAction.OnLeaveChatClick -> onLeaveChatClick()
             is ChatDetailAction.OnMessageLongClick -> {}
-            is ChatDetailAction.OnRetryClick -> {}
+            is ChatDetailAction.OnRetryClick -> retrySendMessage(action.message)
             ChatDetailAction.OnScrollToTop -> {}
             ChatDetailAction.OnSendMessageClick -> sendMessage()
+        }
+    }
+
+    private fun retrySendMessage(message: MessageUI.LocalUserMessage) {
+        viewModelScope.launch {
+            messageRepository
+                .retryMessage(message.id)
+                .onFailure { error ->
+                    eventChannel.send(ChatDetailEvent.OnError(error.toUiText()))
+                }
         }
     }
 
@@ -163,17 +175,6 @@ class ChatDetailViewModel(
                 } else {
                     emptyFlow()
                 }
-            }
-            .combine(sessionStorage.observeAuthInfo()) { messages, authInfo ->
-                if (authInfo == null) {
-                    return@combine messages
-                }
-                _state.update {
-                    it.copy(
-                        messages = messages.map { it.toUI(authInfo.user.id) }
-                    )
-                }
-                messages
             }
 
         val isNearBottom = state.map { it.isNearBottom }.distinctUntilChanged()
