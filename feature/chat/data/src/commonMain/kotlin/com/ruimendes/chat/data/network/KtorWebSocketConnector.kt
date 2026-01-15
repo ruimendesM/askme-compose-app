@@ -215,9 +215,6 @@ class KtorWebSocketConnector(
         }
 
         return try {
-            if (Random.nextBoolean()) {
-                throw Exception("Random error")
-            }
             currentSession?.send(message)
             Result.Success(Unit)
         } catch (e: Exception) {

@@ -123,6 +123,25 @@ fun ChatDetailScreen(
 ) {
     val configuration = currentDeviceConfiguration()
     val messageListState = rememberLazyListState()
+
+    val realMessageItemCount = remember(state.messages) {
+        state.messages
+            .filter {
+                it is MessageUI.LocalUserMessage || it is MessageUI.OtherUserMessage
+            }
+            .size
+    }
+
+    PaginationScrollListener(
+        lazyListState = messageListState,
+        itemCount = realMessageItemCount,
+        isPaginationLoading = state.isPaginationLoading,
+        isEndReached = state.endReached,
+        onNearTop = {
+            onAction(ChatDetailAction.OnScrollToTop)
+        }
+        )
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -189,6 +208,8 @@ fun ChatDetailScreen(
                             messages = state.messages,
                             messageWithOpenMenu = state.messageWithOpenMenu,
                             listState = messageListState,
+                            isPaginationLoading = state.isPaginationLoading,
+                            paginationError = state.paginationError?.toString(),
                             onMessageLongClick = {
                                 onAction(ChatDetailAction.OnMessageLongClick(it))
                             },
@@ -200,6 +221,9 @@ fun ChatDetailScreen(
                             },
                             onDeleteMessageClick = {
                                 onAction(ChatDetailAction.OnDeleteMessageClick(it))
+                            },
+                            onRetryPaginationClick = {
+                                onAction(ChatDetailAction.OnRetryPaginationClick)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
