@@ -1,6 +1,8 @@
 package com.ruimendes.chat.presentation.chat_detail
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +24,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,6 +36,8 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import askme.feature.chat.presentation.generated.resources.Res
@@ -38,6 +46,7 @@ import askme.feature.chat.presentation.generated.resources.select_a_chat
 import com.ruimendes.chat.domain.models.ChatMessage
 import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.presentation.chat_detail.components.ChatDetailHeader
+import com.ruimendes.chat.presentation.chat_detail.components.DateChip
 import com.ruimendes.chat.presentation.chat_detail.components.MessageBox
 import com.ruimendes.chat.presentation.chat_detail.components.MessageList
 import com.ruimendes.chat.presentation.components.ChatHeader
@@ -52,6 +61,7 @@ import com.ruimendes.core.presentation.util.UiText
 import com.ruimendes.core.presentation.util.clearFocusOnTap
 import com.ruimendes.core.presentation.util.currentDeviceConfiguration
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -73,6 +83,9 @@ fun ChatDetailRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackbarState = remember { SnackbarHostState() }
+    val messageListState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             ChatDetailEvent.OnChatLeft -> onBack()
@@ -81,7 +94,10 @@ fun ChatDetailRoot(
             }
 
             ChatDetailEvent.OnNewMessage -> {
-                // TODO auto scroll to bottom
+                scope.launch {
+                    messageListState.animateScrollToItem(0)
+                }
+
             }
         }
     }
@@ -90,7 +106,6 @@ fun ChatDetailRoot(
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
     }
 
-    val scope = rememberCoroutineScope()
     BackHandler(enabled = !isDetailPresent) {
         scope.launch {
             // Delay to prevent detail back animation from showing an unselected chat the moment we go back
@@ -102,11 +117,13 @@ fun ChatDetailRoot(
 
     ChatDetailScreen(
         state = state,
+        messageListState = messageListState,
         isDetailPresent = isDetailPresent,
         snackbarState = snackbarState,
         onAction = { action ->
             when (action) {
                 is ChatDetailAction.OnChatMembersClick -> onChatMembersClick()
+                is ChatDetailAction.OnBackClick -> onBack()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -117,12 +134,12 @@ fun ChatDetailRoot(
 @Composable
 fun ChatDetailScreen(
     state: ChatDetailState,
+    messageListState: LazyListState,
     isDetailPresent: Boolean,
     snackbarState: SnackbarHostState,
     onAction: (ChatDetailAction) -> Unit,
 ) {
     val configuration = currentDeviceConfiguration()
-    val messageListState = rememberLazyListState()
 
     val realMessageItemCount = remember(state.messages) {
         state.messages
@@ -132,6 +149,28 @@ fun ChatDetailScreen(
             .size
     }
 
+    LaunchedEffect(messageListState) {
+        snapshotFlow {
+            messageListState.firstVisibleItemIndex to messageListState.layoutInfo.totalItemsCount
+        }.filter { (firstVisbileIndex, totalItemsCount) ->
+            firstVisbileIndex >= 0 && totalItemsCount > 0
+        }.collect { (firstVisibleIndex, _) ->
+            onAction(ChatDetailAction.OnFirstVisibleIndexChanged(firstVisibleIndex))
+        }
+    }
+
+    MessageBannerListener(
+        lazyListState = messageListState,
+        messages = state.messages,
+        isBannerVisible = state.bannerState.isVisible,
+        onShowBanner = { index ->
+            onAction(ChatDetailAction.OnTopVisibleIndexChanged(index))
+        },
+        onHide = {
+            onAction(ChatDetailAction.OnHideBanner)
+        }
+    )
+
     PaginationScrollListener(
         lazyListState = messageListState,
         itemCount = realMessageItemCount,
@@ -140,7 +179,12 @@ fun ChatDetailScreen(
         onNearTop = {
             onAction(ChatDetailAction.OnScrollToTop)
         }
-        )
+    )
+
+    var headerHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    val density = LocalDensity.current
 
     Scaffold(
         modifier = Modifier
@@ -181,7 +225,13 @@ fun ChatDetailScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
-                        ChatHeader {
+                        ChatHeader(
+                            modifier = Modifier.onSizeChanged {
+                                headerHeight = with(density) {
+                                    it.height.toDp()
+                                }
+                            }
+                        ) {
                             ChatDetailHeader(
                                 chat = state.chat,
                                 isDetailPresent = isDetailPresent,
@@ -273,6 +323,21 @@ fun ChatDetailScreen(
                     }
                 }
             }
+
+            AnimatedVisibility(
+                visible = state.bannerState.isVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = headerHeight + 16.dp)
+            ) {
+                if(state.bannerState.formattedDate != null) {
+                    DateChip(
+                        date = state.bannerState.formattedDate.asString()
+                    )
+                }
+            }
         }
     }
 }
@@ -341,6 +406,7 @@ private fun EmptyPreview(darkTheme: Boolean) {
     AppTheme(darkTheme = darkTheme) {
         ChatDetailScreen(
             state = ChatDetailState(),
+            messageListState = rememberLazyListState(),
             isDetailPresent = true,
             onAction = {},
             snackbarState = SnackbarHostState()
@@ -445,6 +511,7 @@ private fun Preview(darkTheme: Boolean) {
                     }
                 }
             ),
+            messageListState = rememberLazyListState(),
             isDetailPresent = false,
             onAction = {},
             snackbarState = SnackbarHostState()
