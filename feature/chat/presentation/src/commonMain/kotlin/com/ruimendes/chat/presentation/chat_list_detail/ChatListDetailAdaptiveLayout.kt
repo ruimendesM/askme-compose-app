@@ -20,6 +20,7 @@ import com.ruimendes.chat.presentation.chat_detail.ChatDetailRoot
 import com.ruimendes.chat.presentation.chat_list.ChatListRoot
 import com.ruimendes.chat.presentation.create_chat.CreateChatRoot
 import com.ruimendes.chat.presentation.manage_chat.ManageChatRoot
+import com.ruimendes.chat.presentation.profile.ProfileRoot
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
 import com.ruimendes.core.presentation.util.DialogSheetScopedViewModel
@@ -124,6 +125,16 @@ fun ChatListDetailAdaptiveLayout(
             onMembersAdded = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             },
+            onDismiss = {
+                chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
+            }
+        )
+    }
+
+    DialogSheetScopedViewModel(
+        visible = sharedState.dialogState is DialogState.Profile
+    ) {
+        ProfileRoot(
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
             }

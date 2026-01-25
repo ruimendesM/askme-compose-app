@@ -1,6 +1,7 @@
 package com.ruimendes.core.designsystem.components.dialogs
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,6 +23,7 @@ fun AppDialogContent(
         Surface(
             modifier = modifier
                 .fillMaxWidth()
+                .heightIn(max = 580.dp)
                 .clip(RoundedCornerShape(16.dp)),
             color = MaterialTheme.colorScheme.surface
         ) {

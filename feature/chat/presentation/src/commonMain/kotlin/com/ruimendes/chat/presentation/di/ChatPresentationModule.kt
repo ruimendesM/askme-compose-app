@@ -5,6 +5,7 @@ import com.ruimendes.chat.presentation.chat_list.ChatListViewModel
 import com.ruimendes.chat.presentation.chat_list_detail.ChatListDetailViewModel
 import com.ruimendes.chat.presentation.create_chat.CreateChatViewModel
 import com.ruimendes.chat.presentation.manage_chat.ManageChatViewModel
+import com.ruimendes.chat.presentation.profile.ProfileViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -14,6 +15,7 @@ val chatPresentationModule = module {
     viewModelOf(::CreateChatViewModel)
     viewModelOf(::ChatDetailViewModel)
     viewModelOf(::ManageChatViewModel)
+    viewModelOf(::ProfileViewModel)
 }
 
 

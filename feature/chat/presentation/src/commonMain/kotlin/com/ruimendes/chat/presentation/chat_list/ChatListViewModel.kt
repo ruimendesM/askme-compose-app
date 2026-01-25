@@ -59,7 +59,23 @@ class ChatListViewModel(
                 }
             }
 
-            else -> Unit
+            ChatListAction.OnConfirmLogout -> {}
+            ChatListAction.OnCreateChatClick -> {}
+            ChatListAction.OnDismissLogoutDialog -> {}
+
+            ChatListAction.OnLogoutClick,
+            ChatListAction.OnProfileSettingsClick,
+            ChatListAction.OnDismissUserMenu -> {
+                _state.update {
+                    it.copy(isUserMenuOpen = false)
+                }
+            }
+
+            ChatListAction.OnUserAvatarClick -> {
+                _state.update {
+                    it.copy(isUserMenuOpen = true)
+                }
+            }
         }
     }
 

@@ -71,16 +71,16 @@ fun AppButton(
             ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.error,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = MaterialTheme.colorScheme.extended.textDisabled
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled
             )
         }
         AppButtonStyle.TEXT -> {
             ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.tertiary,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = MaterialTheme.colorScheme.extended.textDisabled
+                disabledContentColor = MaterialTheme.colorScheme.extended.textDisabled,
+                disabledContainerColor = Color.Transparent
             )
         }
     }
@@ -140,10 +140,7 @@ fun AppButton(
                     if(isLoading) 0f else 1f
                 )
             ) {
-                leadingIcon?.let {
-                    it.invoke()
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+                leadingIcon?.invoke()
                 Text(
                     text = text,
                     style = MaterialTheme.typography.titleSmall
