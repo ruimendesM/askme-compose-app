@@ -1,6 +1,7 @@
 package com.ruimendes.core.data.auth
 
 import com.ruimendes.core.data.dto.AuthInfoSerializable
+import com.ruimendes.core.data.dto.requests.ChangePasswordRequest
 import com.ruimendes.core.data.dto.requests.EmailRequest
 import com.ruimendes.core.data.dto.requests.LoginRequest
 import com.ruimendes.core.data.dto.requests.RegisterRequest
@@ -78,6 +79,19 @@ class KtorAuthService(
         return httpClient.post(
             route = "auth/reset-password",
             body = ResetPasswordRequest(newPassword, token)
+        )
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "auth/change-password",
+            body = ChangePasswordRequest(
+                oldPassword = currentPassword,
+                newPassword = newPassword
+            )
         )
     }
 }

@@ -9,6 +9,7 @@ sealed interface ProfileAction {
     data object OnDeletePictureClick: ProfileAction
     data object OnConfirmPictureDeleteClick: ProfileAction
     data object OnDismissDeleteConfirmationDialogClick: ProfileAction
+    data object OnToggleCurrentPasswordVisibility: ProfileAction
     data object OnToggleNewPasswordVisibility: ProfileAction
     data object OnChangePasswordClick: ProfileAction
 }
