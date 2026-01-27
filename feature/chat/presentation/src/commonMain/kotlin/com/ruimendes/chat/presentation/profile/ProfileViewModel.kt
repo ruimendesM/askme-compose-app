@@ -1,5 +1,6 @@
 package com.ruimendes.chat.presentation.profile
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
@@ -7,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.error_current_password_equal_to_new_one
 import askme.feature.chat.presentation.generated.resources.error_current_password_incorrect
+import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.core.domain.auth.AuthService
+import com.ruimendes.core.domain.auth.SessionStorage
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.onFailure
 import com.ruimendes.core.domain.util.onSuccess
@@ -26,15 +29,31 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val chatParticipantService: ChatParticipantService,
+    private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(ProfileState())
-    val state = _state
+    val state = combine(
+        _state,
+        sessionStorage.observeAuthInfo()
+    ) { currentState, authInfo ->
+        if (authInfo != null) {
+            currentState.copy(
+                username = authInfo.user.username,
+                emailTextState = TextFieldState(initialText = authInfo.user.email),
+                profilePictureUrl = authInfo.user.profilePictureUrl
+            )
+        } else {
+            currentState
+        }
+    }
         .onStart {
             if (!hasLoadedInitialData) {
+                fetchLocalParticipantDetails()
                 observeCanChangePassword()
                 hasLoadedInitialData = true
             }
@@ -58,6 +77,12 @@ class ProfileViewModel(
             ProfileAction.OnToggleNewPasswordVisibility -> toggleNewPasswordVisibility()
             ProfileAction.OnUploadPictureClick -> {}
             is ProfileAction.OnUriSelected -> {}
+        }
+    }
+
+    private fun fetchLocalParticipantDetails() {
+        viewModelScope.launch {
+            chatParticipantService.getLocalParticipant()
         }
     }
 

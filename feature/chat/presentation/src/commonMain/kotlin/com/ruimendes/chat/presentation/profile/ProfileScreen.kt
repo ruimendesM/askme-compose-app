@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.cancel
-import askme.feature.chat.presentation.generated.resources.contact_chirp_support_change_email
+import askme.feature.chat.presentation.generated.resources.contact_support_change_email
 import askme.feature.chat.presentation.generated.resources.current_password
 import askme.feature.chat.presentation.generated.resources.delete
 import askme.feature.chat.presentation.generated.resources.delete_profile_picture
@@ -185,7 +185,7 @@ fun ProfileScreen(
             AppTextField(
                 state = state.emailTextState,
                 enabled = false,
-                supportingText = stringResource(Res.string.contact_chirp_support_change_email)
+                supportingText = stringResource(Res.string.contact_support_change_email)
             )
         }
         AppHorizontalDivider()

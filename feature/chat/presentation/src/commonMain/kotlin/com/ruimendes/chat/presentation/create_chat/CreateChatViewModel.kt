@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.error_participant_not_found
-import com.ruimendes.chat.domain.chat.ChatParticipantService
+import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.presentation.components.manage_chat.ManageChatAction
 import com.ruimendes.chat.presentation.components.manage_chat.ManageChatState

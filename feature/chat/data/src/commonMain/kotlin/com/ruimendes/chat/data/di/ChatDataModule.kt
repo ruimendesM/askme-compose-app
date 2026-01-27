@@ -1,7 +1,7 @@
 package com.ruimendes.chat.data.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.ruimendes.chat.data.chat.KtorChatParticipantService
+import com.ruimendes.chat.data.participant.KtorChatParticipantService
 import com.ruimendes.chat.data.chat.KtorChatService
 import com.ruimendes.chat.data.chat.OfflineFirstChatRepository
 import com.ruimendes.chat.data.chat.WebSocketChatConnectionClient
@@ -10,13 +10,15 @@ import com.ruimendes.chat.data.message.OfflineFirstMessageRepository
 import com.ruimendes.chat.data.network.ConnectionErrorHandler
 import com.ruimendes.chat.data.network.ConnectionRetryHandler
 import com.ruimendes.chat.data.network.KtorWebSocketConnector
+import com.ruimendes.chat.data.participant.OfflineFirstChatParticipantRepository
 import com.ruimendes.chat.database.DatabaseFactory
 import com.ruimendes.chat.domain.chat.ChatConnectionClient
-import com.ruimendes.chat.domain.chat.ChatParticipantService
+import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.chat.ChatService
 import com.ruimendes.chat.domain.message.ChatMessageService
 import com.ruimendes.chat.domain.message.MessageRepository
+import com.ruimendes.chat.domain.participant.ChatParticipantRepository
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -35,6 +37,7 @@ val chatDataModule = module {
     singleOf(::ConnectionRetryHandler)
     singleOf(::KtorWebSocketConnector)
     singleOf(::KtorChatMessageService) bind ChatMessageService::class
+    singleOf(::OfflineFirstChatParticipantRepository) bind ChatParticipantRepository::class
     single {
         Json {
             ignoreUnknownKeys = true

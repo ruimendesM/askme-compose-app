@@ -3,6 +3,7 @@ package com.ruimendes.chat.data.mappers
 import com.ruimendes.chat.data.dto.ChatParticipantDto
 import com.ruimendes.chat.database.entities.ChatParticipantEntity
 import com.ruimendes.chat.domain.models.ChatParticipant
+import com.ruimendes.core.domain.auth.User
 
 fun ChatParticipantDto.toDomain(): ChatParticipant {
     return ChatParticipant(
