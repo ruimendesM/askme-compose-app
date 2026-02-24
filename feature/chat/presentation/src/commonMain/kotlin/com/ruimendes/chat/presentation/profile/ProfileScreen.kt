@@ -44,6 +44,7 @@ import askme.feature.chat.presentation.generated.resources.upload_icon
 import askme.feature.chat.presentation.generated.resources.upload_image
 import com.ruimendes.chat.presentation.profile.components.ProfileHeaderSection
 import com.ruimendes.chat.presentation.profile.components.ProfileSectionLayout
+import com.ruimendes.chat.presentation.profile.mediapicker.rememberImagePickerLauncher
 import com.ruimendes.core.designsystem.components.avatar.AppAvatarPhoto
 import com.ruimendes.core.designsystem.components.avatar.AvatarSize
 import com.ruimendes.core.designsystem.components.brand.AppHorizontalDivider
@@ -70,6 +71,12 @@ fun ProfileRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val launcher = rememberImagePickerLauncher { pickedImageData ->
+        viewModel.onAction(
+            ProfileAction.OnPictureSelected(pickedImageData.bytes, pickedImageData.mimeType)
+        )
+    }
+
     AppAdaptativeDialogSheetLayout(
         onDismiss = onDismiss
     ) {
@@ -79,6 +86,10 @@ fun ProfileRoot(
                 when (action) {
                     is ProfileAction.OnDismiss -> {
                         onDismiss()
+                    }
+
+                    is ProfileAction.OnUploadPictureClick -> {
+                        launcher.launch()
                     }
 
                     else -> Unit
