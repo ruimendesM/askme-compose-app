@@ -8,6 +8,7 @@ import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.chat.domain.models.ChatParticipant
 import com.ruimendes.chat.domain.models.ProfilePictureUploadUrls
 import com.ruimendes.core.data.networking.constructRoute
+import com.ruimendes.core.data.networking.delete
 import com.ruimendes.core.data.networking.get
 import com.ruimendes.core.data.networking.post
 import com.ruimendes.core.data.networking.put
@@ -72,6 +73,12 @@ class KtorChatParticipantService(
         return httpClient.post<ConfirmProfilePictureRequest, Unit>(
             route = "participants/confirm-profile-picture",
             body = ConfirmProfilePictureRequest(publicUrl)
+        )
+    }
+
+    override suspend fun deleteProfilePicture(): EmptyResult<DataError.Remote> {
+        return httpClient.delete(
+            route = "/participants/profile-picture"
         )
     }
 }

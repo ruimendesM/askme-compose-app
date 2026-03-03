@@ -70,11 +70,9 @@ class ProfileViewModel(
     fun onAction(action: ProfileAction) {
         when (action) {
             ProfileAction.OnChangePasswordClick -> changePassword()
-            ProfileAction.OnConfirmPictureDeleteClick -> {}
-            ProfileAction.OnDeletePictureClick -> {}
-            ProfileAction.OnDismiss -> {}
-            ProfileAction.OnDismissDeleteConfirmationDialogClick -> {}
-            ProfileAction.OnErrorImagePicker -> {}
+            ProfileAction.OnConfirmPictureDeleteClick -> deleteProfilePicture()
+            ProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
+            ProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
             is ProfileAction.OnPictureSelected -> uploadProfilePicture(
                 action.bytes,
                 action.mimeType
@@ -82,8 +80,55 @@ class ProfileViewModel(
 
             ProfileAction.OnToggleCurrentPasswordVisibility -> toggleCurrentPasswordVisibility()
             ProfileAction.OnToggleNewPasswordVisibility -> toggleNewPasswordVisibility()
-            ProfileAction.OnUploadPictureClick -> {}
-            is ProfileAction.OnUriSelected -> {}
+            else -> Unit
+        }
+    }
+
+    private fun deleteProfilePicture() {
+        if (state.value.isDeletingImage && state.value.profilePictureUrl != null) {
+            return
+        }
+
+        _state.update {
+            it.copy(
+                isDeletingImage = true,
+                imageError = null,
+                showDeleteConfirmationDialog = false
+            )
+        }
+
+        viewModelScope.launch {
+            chatParticipantRepository
+                .deleteProfilePicture()
+                .onSuccess {
+                    _state.update { it.copy(
+                        isDeletingImage = false
+                    ) }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            isDeletingImage = false,
+                            imageError = error.toUiText()
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun dismissDeleteConfirmation() {
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = false
+            )
+        }
+    }
+
+    private fun showDeleteConfirmation() {
+        _state.update {
+            it.copy(
+                showDeleteConfirmationDialog = true
+            )
         }
     }
 
@@ -93,9 +138,11 @@ class ProfileViewModel(
         }
 
         if (mimeType == null) {
-            _state.update { it.copy(
-                imageError = UiText.Resource(Res.string.error_invalid_file_type)
-            ) }
+            _state.update {
+                it.copy(
+                    imageError = UiText.Resource(Res.string.error_invalid_file_type)
+                )
+            }
             return
         }
 
@@ -110,15 +157,19 @@ class ProfileViewModel(
             chatParticipantRepository
                 .uploadProfilePicture(bytes, mimeType)
                 .onSuccess {
-                    _state.update { it.copy(
-                        isUploadingImage = false
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isUploadingImage = false
+                        )
+                    }
                 }
                 .onFailure { error ->
-                    _state.update { it.copy(
-                        isUploadingImage = false,
-                        imageError = error.toUiText()
-                    ) }
+                    _state.update {
+                        it.copy(
+                            isUploadingImage = false,
+                            imageError = error.toUiText()
+                        )
+                    }
                 }
         }
     }

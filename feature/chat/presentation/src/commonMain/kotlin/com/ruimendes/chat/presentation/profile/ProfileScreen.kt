@@ -166,7 +166,7 @@ fun ProfileScreen(
                     AppButton(
                         text = stringResource(Res.string.delete),
                         onClick = {
-                            onAction(ProfileAction.OnUploadPictureClick)
+                            onAction(ProfileAction.OnDeletePictureClick)
                         },
                         style = AppButtonStyle.DESTRUCTIVE_SECONDARY,
                         enabled = !state.isUploadingImage && !state.isDeletingImage && state.profilePictureUrl != null,
