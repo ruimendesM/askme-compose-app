@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.error_current_password_equal_to_new_one
 import askme.feature.chat.presentation.generated.resources.error_current_password_incorrect
+import askme.feature.chat.presentation.generated.resources.error_invalid_file_type
+import com.ruimendes.chat.domain.participant.ChatParticipantRepository
 import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.core.domain.auth.AuthService
 import com.ruimendes.core.domain.auth.SessionStorage
@@ -31,6 +33,7 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val authService: AuthService,
     private val chatParticipantService: ChatParticipantService,
+    private val chatParticipantRepository: ChatParticipantRepository,
     private val sessionStorage: SessionStorage
 ) : ViewModel() {
 
@@ -72,11 +75,51 @@ class ProfileViewModel(
             ProfileAction.OnDismiss -> {}
             ProfileAction.OnDismissDeleteConfirmationDialogClick -> {}
             ProfileAction.OnErrorImagePicker -> {}
-            is ProfileAction.OnPictureSelected -> {}
+            is ProfileAction.OnPictureSelected -> uploadProfilePicture(
+                action.bytes,
+                action.mimeType
+            )
+
             ProfileAction.OnToggleCurrentPasswordVisibility -> toggleCurrentPasswordVisibility()
             ProfileAction.OnToggleNewPasswordVisibility -> toggleNewPasswordVisibility()
             ProfileAction.OnUploadPictureClick -> {}
             is ProfileAction.OnUriSelected -> {}
+        }
+    }
+
+    private fun uploadProfilePicture(bytes: ByteArray, mimeType: String?) {
+        if (state.value.isUploadingImage) {
+            return
+        }
+
+        if (mimeType == null) {
+            _state.update { it.copy(
+                imageError = UiText.Resource(Res.string.error_invalid_file_type)
+            ) }
+            return
+        }
+
+        _state.update {
+            it.copy(
+                isUploadingImage = true,
+                imageError = null
+            )
+        }
+
+        viewModelScope.launch {
+            chatParticipantRepository
+                .uploadProfilePicture(bytes, mimeType)
+                .onSuccess {
+                    _state.update { it.copy(
+                        isUploadingImage = false
+                    ) }
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(
+                        isUploadingImage = false,
+                        imageError = error.toUiText()
+                    ) }
+                }
         }
     }
 
