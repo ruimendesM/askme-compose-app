@@ -42,6 +42,9 @@ import com.ruimendes.core.designsystem.components.buttons.AppFloatingActionButto
 import com.ruimendes.core.designsystem.components.dialogs.DestructiveConfirmationDialog
 import com.ruimendes.core.designsystem.theme.AppTheme
 import com.ruimendes.core.designsystem.theme.extended
+import com.ruimendes.core.presentation.permissions.Permission
+import com.ruimendes.core.presentation.permissions.PermissionController
+import com.ruimendes.core.presentation.permissions.rememberPermissionController
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -85,6 +88,11 @@ fun ChatListScreen(
     onAction: (ChatListAction) -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
+    val permissionController = rememberPermissionController()
+    LaunchedEffect(true) {
+        permissionController.requestPermission(Permission.NOTIFICATIONS)
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.extended.surfaceLower,
