@@ -10,6 +10,7 @@ import com.ruimendes.chat.data.message.OfflineFirstMessageRepository
 import com.ruimendes.chat.data.network.ConnectionErrorHandler
 import com.ruimendes.chat.data.network.ConnectionRetryHandler
 import com.ruimendes.chat.data.network.KtorWebSocketConnector
+import com.ruimendes.chat.data.notification.KtorDeviceTokenService
 import com.ruimendes.chat.data.participant.OfflineFirstChatParticipantRepository
 import com.ruimendes.chat.database.DatabaseFactory
 import com.ruimendes.chat.domain.chat.ChatConnectionClient
@@ -18,6 +19,7 @@ import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.chat.ChatService
 import com.ruimendes.chat.domain.message.ChatMessageService
 import com.ruimendes.chat.domain.message.MessageRepository
+import com.ruimendes.chat.domain.notifications.DeviceTokenService
 import com.ruimendes.chat.domain.participant.ChatParticipantRepository
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
@@ -37,6 +39,7 @@ val chatDataModule = module {
     singleOf(::ConnectionRetryHandler)
     singleOf(::KtorWebSocketConnector)
     singleOf(::KtorChatMessageService) bind ChatMessageService::class
+    singleOf(::KtorDeviceTokenService) bind DeviceTokenService::class
     singleOf(::OfflineFirstChatParticipantRepository) bind ChatParticipantRepository::class
     single {
         Json {

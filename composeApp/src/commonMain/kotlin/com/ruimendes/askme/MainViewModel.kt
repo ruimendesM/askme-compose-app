@@ -2,10 +2,14 @@ package com.ruimendes.askme
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ruimendes.chat.domain.notifications.DeviceTokenService
+import com.ruimendes.chat.domain.notifications.PushNotificationService
+import com.ruimendes.core.data.util.PlatformUtils
 import com.ruimendes.core.domain.auth.SessionStorage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -16,7 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val pushNotificationService: PushNotificationService,
+    private val deviceTokenService: DeviceTokenService
 ) : ViewModel() {
 
     private val eventChannel = Channel<MainEvent>()
@@ -38,6 +44,8 @@ class MainViewModel(
         )
 
     private var previousRefreshToken: String? = null
+    private var previousDeviceToken: String? = null
+    private var currentDeviceToken: String? = null
 
     init {
         viewModelScope.launch {
@@ -66,10 +74,28 @@ class MainViewModel(
                             isLoggedIn = false
                         )
                     }
+                    currentDeviceToken?.let {
+                        deviceTokenService.unregisterToken(it)
+                    }
+
                     eventChannel.send(MainEvent.OnSessionExpired)
                 }
                 previousRefreshToken = authInfo?.refreshToken
             }
+            .combine(pushNotificationService.observeDeviceToken()) { authInfo, deviceToken ->
+                currentDeviceToken = deviceToken
+                if (authInfo != null && deviceToken != previousDeviceToken && deviceToken != null) {
+                    registerDeviceToken(deviceToken, PlatformUtils.getOSName())
+                    previousDeviceToken = deviceToken
+                }
+
+            }
             .launchIn(viewModelScope)
+    }
+
+    private fun registerDeviceToken(token: String, platform: String) {
+        viewModelScope.launch {
+            deviceTokenService.registerToken(token, platform)
+        }
     }
 }
