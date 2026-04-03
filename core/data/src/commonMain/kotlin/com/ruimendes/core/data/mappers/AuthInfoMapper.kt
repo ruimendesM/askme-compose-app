@@ -1,5 +1,6 @@
 package com.ruimendes.core.data.mappers
 
+import com.ruimendes.core.data.auth.decodeJwtRole
 import com.ruimendes.core.data.dto.AuthInfoSerializable
 import com.ruimendes.core.data.dto.UserSerializable
 import com.ruimendes.core.domain.auth.AuthInfo
@@ -9,17 +10,18 @@ fun AuthInfoSerializable.toDomain(): AuthInfo {
     return AuthInfo(
         accessToken = accessToken,
         refreshToken = refreshToken,
-        user = user.toDomain()
+        user = user.toDomain(role = decodeJwtRole(accessToken))
     )
 }
 
-fun UserSerializable.toDomain(): User {
+fun UserSerializable.toDomain(role: String? = null): User {
     return User(
         id = id,
         email = email,
         username = username,
         hasEmailVerified = hasEmailVerified,
-        profilePictureUrl = profilePictureUrl
+        profilePictureUrl = profilePictureUrl,
+        role = role ?: this.role
     )
 }
 
@@ -37,6 +39,7 @@ fun User.toSerializable(): UserSerializable {
         email = email,
         username = username,
         hasEmailVerified = hasEmailVerified,
-        profilePictureUrl = profilePictureUrl
+        profilePictureUrl = profilePictureUrl,
+        role = role
     )
 }
