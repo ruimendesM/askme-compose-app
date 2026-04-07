@@ -8,5 +8,6 @@ data class ChatUI(
     val localParticipant: ChatParticipantUI,
     val otherParticipants: List<ChatParticipantUI>,
     val lastMessage: ChatMessage?,
-    val lastMessageSenderUsername: String?
+    val lastMessageSenderUsername: String?,
+    val isAdminInbox: Boolean = false
 )
