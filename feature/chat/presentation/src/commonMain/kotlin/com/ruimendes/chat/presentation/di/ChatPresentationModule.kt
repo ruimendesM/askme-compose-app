@@ -1,5 +1,6 @@
 package com.ruimendes.chat.presentation.di
 
+import com.ruimendes.chat.presentation.anonymous_inbox.AnonymousInboxViewModel
 import com.ruimendes.chat.presentation.chat_detail.ChatDetailViewModel
 import com.ruimendes.chat.presentation.chat_list.ChatListViewModel
 import com.ruimendes.chat.presentation.chat_list_detail.ChatListDetailViewModel
@@ -11,6 +12,7 @@ import org.koin.dsl.module
 
 val chatPresentationModule = module {
     viewModelOf(::ChatListViewModel)
+    viewModelOf(::AnonymousInboxViewModel)
     viewModelOf(::ChatListDetailViewModel)
     viewModelOf(::CreateChatViewModel)
     viewModelOf(::ChatDetailViewModel)

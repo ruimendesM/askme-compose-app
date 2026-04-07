@@ -16,6 +16,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ruimendes.chat.presentation.anonymous_inbox.AnonymousInboxRoot
 import com.ruimendes.chat.presentation.chat_detail.ChatDetailRoot
 import com.ruimendes.chat.presentation.chat_list.ChatListRoot
 import com.ruimendes.chat.presentation.create_chat.CreateChatRoot
@@ -90,20 +91,29 @@ fun ChatListDetailAdaptiveLayout(
         detailPane = {
             AnimatedPane {
                 val listPane = scaffoldNavigator.scaffoldValue[ListDetailPaneScaffoldRole.List]
-                ChatDetailRoot(
-                    chatId = sharedState.selectedChatId,
-                    isDetailPresent = detailPane == PaneAdaptedValue.Expanded && listPane == PaneAdaptedValue.Expanded,
-                    onChatMembersClick = {
-                        chatListDetailViewModel.onAction(ChatListDetailAction.OnManageChatClick)
-                    },
-                    onBack = {
-                        scope.launch {
-                            if (scaffoldNavigator.canNavigateBack()) {
-                                scaffoldNavigator.navigateBack()
-                            }
+                val isDetailPresent = detailPane == PaneAdaptedValue.Expanded && listPane == PaneAdaptedValue.Expanded
+                val onBack: () -> Unit = {
+                    scope.launch {
+                        if (scaffoldNavigator.canNavigateBack()) {
+                            scaffoldNavigator.navigateBack()
                         }
                     }
-                )
+                }
+                if (sharedState.isAdminInbox) {
+                    AnonymousInboxRoot(
+                        isDetailPresent = isDetailPresent,
+                        onBack = onBack
+                    )
+                } else {
+                    ChatDetailRoot(
+                        chatId = sharedState.selectedChatId,
+                        isDetailPresent = isDetailPresent,
+                        onChatMembersClick = {
+                            chatListDetailViewModel.onAction(ChatListDetailAction.OnManageChatClick)
+                        },
+                        onBack = onBack
+                    )
+                }
             }
         }
     )
