@@ -1,6 +1,9 @@
 package com.ruimendes.chat.data.di
 
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.ruimendes.chat.data.anonymous.AnonymousMessageService
+import com.ruimendes.chat.data.anonymous.KtorAnonymousMessageService
+import com.ruimendes.chat.data.anonymous.OfflineFirstAnonymousMessageRepository
 import com.ruimendes.chat.data.participant.KtorChatParticipantService
 import com.ruimendes.chat.data.chat.KtorChatService
 import com.ruimendes.chat.data.chat.OfflineFirstChatRepository
@@ -13,6 +16,7 @@ import com.ruimendes.chat.data.network.KtorWebSocketConnector
 import com.ruimendes.chat.data.notification.KtorDeviceTokenService
 import com.ruimendes.chat.data.participant.OfflineFirstChatParticipantRepository
 import com.ruimendes.chat.database.DatabaseFactory
+import com.ruimendes.chat.domain.anonymous.AnonymousMessageRepository
 import com.ruimendes.chat.domain.chat.ChatConnectionClient
 import com.ruimendes.chat.domain.participant.ChatParticipantService
 import com.ruimendes.chat.domain.chat.ChatRepository
@@ -41,6 +45,8 @@ val chatDataModule = module {
     singleOf(::KtorChatMessageService) bind ChatMessageService::class
     singleOf(::KtorDeviceTokenService) bind DeviceTokenService::class
     singleOf(::OfflineFirstChatParticipantRepository) bind ChatParticipantRepository::class
+    singleOf(::KtorAnonymousMessageService) bind AnonymousMessageService::class
+    singleOf(::OfflineFirstAnonymousMessageRepository) bind AnonymousMessageRepository::class
     single {
         Json {
             ignoreUnknownKeys = true
@@ -50,6 +56,7 @@ val chatDataModule = module {
         get<DatabaseFactory>()
             .create()
             .setDriver(BundledSQLiteDriver())
+            .fallbackToDestructiveMigration(true)
             .build()
     }
 }

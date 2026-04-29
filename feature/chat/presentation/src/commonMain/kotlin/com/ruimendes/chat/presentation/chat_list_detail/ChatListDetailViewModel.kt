@@ -34,7 +34,8 @@ class ChatListDetailViewModel(
             is ChatListDetailAction.OnSelectChat -> {
                 _state.update {
                     it.copy(
-                        selectedChatId = action.chatId
+                        selectedChatId = action.chatId,
+                        isAdminInbox = action.chatId == com.ruimendes.chat.presentation.chat_list.ChatListViewModel.ADMIN_INBOX_ID
                     )
                 }
             }

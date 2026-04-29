@@ -2,8 +2,14 @@ package com.ruimendes.chat.presentation.chat_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ruimendes.chat.domain.anonymous.AnonymousMessage
+import com.ruimendes.chat.domain.anonymous.AnonymousMessageRepository
 import com.ruimendes.chat.domain.chat.ChatRepository
+import com.ruimendes.chat.domain.models.ChatMessage
+import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.presentation.mappers.toUi
+import com.ruimendes.chat.presentation.model.ChatUI
+import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
 import com.ruimendes.core.domain.auth.SessionStorage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +21,8 @@ import kotlinx.coroutines.launch
 
 class ChatListViewModel(
     private val repository: ChatRepository,
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val anonymousMessageRepository: AnonymousMessageRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -24,16 +31,24 @@ class ChatListViewModel(
     val state = combine(
         _state,
         repository.getChats(),
-        sessionStorage.observeAuthInfo()
-    ) { currentState, chats, authInfo ->
+        sessionStorage.observeAuthInfo(),
+        anonymousMessageRepository.getLatestMessage()
+    ) { currentState, chats, authInfo, latestAnonymousMessage ->
         if (authInfo == null) {
             return@combine ChatListState()
         }
+        val regularChats = chats
+            .map { it.toUi(authInfo.user.id) }
+            .filter { it.otherParticipants.isNotEmpty() }
+
+        val adminInboxList = if (authInfo.isAdmin) {
+            listOf(buildAdminInboxItem(authInfo.user.id, latestAnonymousMessage))
+        } else {
+            emptyList()
+        }
+
         currentState.copy(
-            // TODO revisit filter here - how to handle chats with no other participants
-            chats = chats
-                .map { it.toUi(authInfo.user.id) }
-                .filter { it.otherParticipants.isNotEmpty() },
+            chats = adminInboxList + regularChats,
             localParticipant = authInfo.user.toUi()
         )
     }
@@ -85,4 +100,41 @@ class ChatListViewModel(
         }
     }
 
+    companion object {
+        const val ADMIN_INBOX_ID = "ADMIN_INBOX"
+
+        fun buildAdminInboxItem(
+            localUserId: String,
+            latestMessage: AnonymousMessage?
+        ): ChatUI {
+            val adminParticipant = ChatParticipantUI(
+                id = ADMIN_INBOX_ID,
+                username = "ADMIN",
+                initials = "AD"
+            )
+            val localParticipant = ChatParticipantUI(
+                id = localUserId,
+                username = "",
+                initials = ""
+            )
+            val lastMessage = latestMessage?.let {
+                ChatMessage(
+                    id = it.id,
+                    chatId = ADMIN_INBOX_ID,
+                    content = it.content,
+                    createdAt = it.createdAt,
+                    senderId = it.senderEmail,
+                    deliveryStatus = ChatMessageDeliveryStatus.SENT
+                )
+            }
+            return ChatUI(
+                id = ADMIN_INBOX_ID,
+                localParticipant = localParticipant,
+                otherParticipants = listOf(adminParticipant),
+                lastMessage = lastMessage,
+                lastMessageSenderUsername = latestMessage?.senderEmail,
+                isAdminInbox = true
+            )
+        }
+    }
 }

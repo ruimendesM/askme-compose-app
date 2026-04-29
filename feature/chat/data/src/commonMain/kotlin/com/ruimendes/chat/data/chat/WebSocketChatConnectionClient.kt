@@ -1,5 +1,7 @@
 package com.ruimendes.chat.data.chat
 
+import com.ruimendes.chat.data.anonymous.AnonymousMessageDto
+import com.ruimendes.chat.data.anonymous.toDomain
 import com.ruimendes.chat.data.dto.websocket.IncomingWebSocketDto
 import com.ruimendes.chat.data.dto.websocket.IncomingWebSocketType
 import com.ruimendes.chat.data.dto.websocket.WebSocketMessageDto
@@ -7,6 +9,7 @@ import com.ruimendes.chat.data.mappers.toDomain
 import com.ruimendes.chat.data.mappers.toEntity
 import com.ruimendes.chat.data.network.KtorWebSocketConnector
 import com.ruimendes.chat.database.AppChatDatabase
+import com.ruimendes.chat.domain.anonymous.AnonymousMessageRepository
 import com.ruimendes.chat.domain.chat.ChatConnectionClient
 import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.core.domain.auth.SessionStorage
@@ -24,6 +27,7 @@ class WebSocketChatConnectionClient(
     private val chatRepository: ChatRepository,
     private val database: AppChatDatabase,
     private val sessionStorage: SessionStorage,
+    private val anonymousMessageRepository: AnonymousMessageRepository,
     private val json: Json,
     private val applicationScope: CoroutineScope
 ) : ChatConnectionClient {
@@ -61,6 +65,10 @@ class WebSocketChatConnectionClient(
                 json.decodeFromString<IncomingWebSocketDto.ChatParticipantsChangedDto>(message.payload)
             }
 
+            IncomingWebSocketType.NEW_ANONYMOUS_MESSAGE.name -> {
+                json.decodeFromString<IncomingWebSocketDto.NewAnonymousMessageDto>(message.payload)
+            }
+
             else -> null
         }
     }
@@ -71,6 +79,7 @@ class WebSocketChatConnectionClient(
             is IncomingWebSocketDto.MessageDeletedDto -> deleteMessage(message)
             is IncomingWebSocketDto.NewMessageDto -> handleNewMessage(message)
             is IncomingWebSocketDto.ProfilePictureUpdatedDto -> updateProfilePicture(message)
+            is IncomingWebSocketDto.NewAnonymousMessageDto -> handleNewAnonymousMessage(message)
         }
     }
 
@@ -108,5 +117,19 @@ class WebSocketChatConnectionClient(
                 )
             )
         }
+    }
+
+    private suspend fun handleNewAnonymousMessage(message: IncomingWebSocketDto.NewAnonymousMessageDto) {
+        val authInfo = sessionStorage.observeAuthInfo().firstOrNull()
+        if (authInfo?.isAdmin != true) return
+
+        val domainMessage = AnonymousMessageDto(
+            id = message.id,
+            senderEmail = message.senderEmail,
+            content = message.content,
+            createdAt = message.createdAt
+        ).toDomain()
+
+        anonymousMessageRepository.saveMessage(domainMessage)
     }
 }
