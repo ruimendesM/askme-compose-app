@@ -4,6 +4,7 @@ import com.ruimendes.core.data.dto.AuthInfoSerializable
 import com.ruimendes.core.data.dto.requests.ChangePasswordRequest
 import com.ruimendes.core.data.dto.requests.EmailRequest
 import com.ruimendes.core.data.dto.requests.LoginRequest
+import com.ruimendes.core.data.dto.requests.RefreshRequest
 import com.ruimendes.core.data.dto.requests.RegisterRequest
 import com.ruimendes.core.data.dto.requests.ResetPasswordRequest
 import com.ruimendes.core.data.mappers.toDomain
@@ -14,8 +15,13 @@ import com.ruimendes.core.domain.auth.AuthService
 import com.ruimendes.core.domain.util.DataError
 import com.ruimendes.core.domain.util.EmptyResult
 import com.ruimendes.core.domain.util.Result
+import com.ruimendes.core.domain.util.asEmptyResult
 import com.ruimendes.core.domain.util.map
+import com.ruimendes.core.domain.util.onSuccess
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.authProviders
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 
 class KtorAuthService(
     private val httpClient: HttpClient
@@ -93,5 +99,14 @@ class KtorAuthService(
                 newPassword = newPassword
             )
         )
+    }
+
+    override suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote> {
+        return httpClient.post<RefreshRequest, Unit>(
+            route = "auth/logout",
+            body = RefreshRequest(refreshToken)
+        ).onSuccess {
+            httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+        }
     }
 }

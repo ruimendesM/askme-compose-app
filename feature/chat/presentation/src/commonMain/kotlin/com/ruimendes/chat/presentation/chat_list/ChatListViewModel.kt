@@ -7,23 +7,38 @@ import com.ruimendes.chat.domain.anonymous.AnonymousMessageRepository
 import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.models.ChatMessage
 import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
+import com.ruimendes.chat.domain.notifications.DeviceTokenService
 import com.ruimendes.chat.presentation.mappers.toUi
 import com.ruimendes.chat.presentation.model.ChatUI
 import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
+import com.ruimendes.core.domain.auth.AuthService
 import com.ruimendes.core.domain.auth.SessionStorage
+import com.ruimendes.core.domain.util.onFailure
+import com.ruimendes.core.domain.util.onSuccess
+import com.ruimendes.core.presentation.util.toUiText
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class ChatListViewModel(
     private val repository: ChatRepository,
     private val sessionStorage: SessionStorage,
-    private val anonymousMessageRepository: AnonymousMessageRepository
+    private val anonymousMessageRepository: AnonymousMessageRepository,
+    private val deviceTokenService: DeviceTokenService,
+    private val authService: AuthService
 ) : ViewModel() {
+
+    private val eventChannel = Channel<ChatListEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     private var hasLoadedInitialData = false
 
@@ -74,11 +89,23 @@ class ChatListViewModel(
                 }
             }
 
-            ChatListAction.OnConfirmLogout -> {}
-            ChatListAction.OnCreateChatClick -> {}
-            ChatListAction.OnDismissLogoutDialog -> {}
+            ChatListAction.OnConfirmLogout -> {
+                logout()
+            }
 
-            ChatListAction.OnLogoutClick,
+            ChatListAction.OnCreateChatClick -> {}
+            ChatListAction.OnDismissLogoutDialog -> {
+                _state.update {
+                    it.copy(
+                        showLogoutConfirmation = false
+                    )
+                }
+            }
+
+            ChatListAction.OnLogoutClick -> {
+                showLogoutConfirmation()
+            }
+
             ChatListAction.OnProfileSettingsClick,
             ChatListAction.OnDismissUserMenu -> {
                 _state.update {
@@ -91,6 +118,43 @@ class ChatListViewModel(
                     it.copy(isUserMenuOpen = true)
                 }
             }
+        }
+    }
+
+    private fun logout() {
+        _state.update {
+            it.copy(
+                showLogoutConfirmation = false
+            )
+        }
+
+        viewModelScope.launch {
+            val authInfo = sessionStorage.observeAuthInfo().first()
+            val refreshToken = authInfo?.refreshToken ?: return@launch
+
+            deviceTokenService
+                .unregisterToken(refreshToken)
+                .onSuccess {
+                    authService
+                        .logout(refreshToken)
+                        .onSuccess {
+                            sessionStorage.set(null)
+                            repository.deleteAllChats()
+                            eventChannel.send(ChatListEvent.OnLogoutSuccess)
+                        }
+                        .onFailure { error ->
+                            eventChannel.send(ChatListEvent.OnLogoutError(error.toUiText()))
+                        }
+                }
+        }
+    }
+
+    private fun showLogoutConfirmation() {
+        _state.update {
+            it.copy(
+                isUserMenuOpen = false,
+                showLogoutConfirmation = true
+            )
         }
     }
 
