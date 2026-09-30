@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import askme.feature.chat.presentation.generated.resources.Res
 import askme.feature.chat.presentation.generated.resources.group_chat
+import askme.feature.chat.presentation.generated.resources.only_you
 import askme.feature.chat.presentation.generated.resources.username_you
 import com.ruimendes.chat.presentation.model.ChatUI
 import com.ruimendes.core.designsystem.components.avatar.AppStackedAvatars
@@ -32,14 +33,16 @@ fun ChatItemHeaderRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        AppStackedAvatars(avatars = chat.otherParticipants)
+        if (chat.otherParticipants.isNotEmpty()) {
+            AppStackedAvatars(avatars = chat.otherParticipants)
+        }
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
                 text = if (!isGroupChat) {
-                    chat.otherParticipants.first().username
+                    chat.otherParticipants.firstOrNull()?.username ?: stringResource(Res.string.only_you)
                 } else {
                     stringResource(Res.string.group_chat)
                 },

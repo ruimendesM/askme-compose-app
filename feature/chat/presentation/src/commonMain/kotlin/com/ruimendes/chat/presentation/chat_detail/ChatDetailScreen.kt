@@ -106,6 +106,12 @@ fun ChatDetailRoot(
         viewModel.onAction(ChatDetailAction.OnSelectChat(chatId))
     }
 
+    LaunchedEffect(chatId, state.messages) {
+        if (state.messages.isNotEmpty()) {
+            messageListState.scrollToItem(0)
+        }
+    }
+
     BackHandler(enabled = !isDetailPresent) {
         scope.launch {
             // Delay to prevent detail back animation from showing an unselected chat the moment we go back
@@ -317,7 +323,8 @@ fun ChatDetailScreen(
                             onSendClick = {
                                 onAction(ChatDetailAction.OnSendMessageClick)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(8.dp)
                         )
                     }
@@ -332,7 +339,7 @@ fun ChatDetailScreen(
                     .align(Alignment.TopCenter)
                     .padding(top = headerHeight + 16.dp)
             ) {
-                if(state.bannerState.formattedDate != null) {
+                if (state.bannerState.formattedDate != null) {
                     DateChip(
                         date = state.bannerState.formattedDate.asString()
                     )

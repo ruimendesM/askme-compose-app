@@ -32,10 +32,14 @@ interface ChatDao {
 
     @Query(
         """
-        SELECT *
-        FROM chatentity
-        ORDER BY lastActivityAt
-        DESC
+        SELECT c.*
+        FROM chatentity c
+        LEFT JOIN (
+            SELECT chatId, MAX(timestamp) AS latest_message_time
+            FROM chatmessageentity
+            GROUP BY chatId
+        ) lm on c.chatId = lm.chatId
+        ORDER BY COALESCE(lm.latest_message_time, c.lastActivityAt) DESC
     """
     )
     @Transaction

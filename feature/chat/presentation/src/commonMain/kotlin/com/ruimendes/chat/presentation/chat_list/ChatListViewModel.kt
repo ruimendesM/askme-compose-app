@@ -8,6 +8,7 @@ import com.ruimendes.chat.domain.chat.ChatRepository
 import com.ruimendes.chat.domain.models.ChatMessage
 import com.ruimendes.chat.domain.models.ChatMessageDeliveryStatus
 import com.ruimendes.chat.domain.notifications.DeviceTokenService
+import com.ruimendes.chat.domain.participant.ChatParticipantRepository
 import com.ruimendes.chat.presentation.mappers.toUi
 import com.ruimendes.chat.presentation.model.ChatUI
 import com.ruimendes.core.designsystem.components.avatar.ChatParticipantUI
@@ -34,7 +35,8 @@ class ChatListViewModel(
     private val sessionStorage: SessionStorage,
     private val anonymousMessageRepository: AnonymousMessageRepository,
     private val deviceTokenService: DeviceTokenService,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val chatParticipantRepository: ChatParticipantRepository
 ) : ViewModel() {
 
     private val eventChannel = Channel<ChatListEvent>()
@@ -70,6 +72,7 @@ class ChatListViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 loadChats()
+                fetchLocalUserProfile()
                 hasLoadedInitialData = true
             }
         }
@@ -118,6 +121,12 @@ class ChatListViewModel(
                     it.copy(isUserMenuOpen = true)
                 }
             }
+        }
+    }
+
+    private fun fetchLocalUserProfile() {
+        viewModelScope.launch {
+            chatParticipantRepository.fetchLocalParticipant()
         }
     }
 
