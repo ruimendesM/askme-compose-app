@@ -40,7 +40,7 @@ fun LastMessageView.toDomain(): ChatMessage {
         content = content,
         createdAt = Instant.fromEpochMilliseconds(timestamp),
         senderId = senderId,
-        deliveryStatus = ChatMessageDeliveryStatus.valueOf(this.deliveryStatus),
+        deliveryStatus = ChatMessageDeliveryStatus.valueOf(this.deliveryStatus)
     )
 }
 
@@ -63,6 +63,7 @@ fun ChatMessage.toLastMessageView(): LastMessageView {
         timestamp = createdAt.toEpochMilliseconds(),
         senderId = senderId,
         deliveryStatus = deliveryStatus.name,
+        senderUsername = null
     )
 }
 
